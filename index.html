@@ -29,44 +29,17 @@
       </button>
       <div class="nav-center">
         <span id="nav-title">Đề 1</span>
-        <div class="nav-tabs">
-          <button class="nav-tab active" data-tab="exam">📄 Đề thi</button>
-          <button class="nav-tab" data-tab="answer">📝 Bài làm</button>
-        </div>
       </div>
       <div class="nav-right">
         <div class="score-badge hidden" id="score-badge"><span id="score-text">0/0</span></div>
+        <span class="answer-status" id="answer-status">0/0 câu</span>
         <button class="btn-submit" id="btn-submit">Nộp bài</button>
         <button class="btn-icon-nav" id="btn-reset" title="Làm lại">↺</button>
       </div>
     </nav>
 
     <div class="exam-body">
-      <!-- LEFT: PDF Viewer -->
-      <div class="exam-panel" id="panel-exam">
-        <div class="panel-toolbar">
-          <button class="tool-btn" id="btn-prev-page" disabled>◀</button>
-          <span id="page-indicator" class="page-ind">1 / 10</span>
-          <button class="tool-btn" id="btn-next-page">▶</button>
-          <div class="tb-sep"></div>
-          <button class="tool-btn" id="btn-zoom-out">−</button>
-          <span id="zoom-val">100%</span>
-          <button class="tool-btn" id="btn-zoom-in">+</button>
-        </div>
-        <div class="pdf-viewer" id="pdf-viewer">
-          <div class="pdf-img-wrap" id="pdf-img-wrap">
-            <img id="pdf-img" src="" alt="Đề thi" draggable="false">
-          </div>
-        </div>
-        <div class="thumb-strip" id="thumb-strip"></div>
-      </div>
-
-      <!-- RIGHT: Answer Sheet -->
       <div class="answer-panel" id="panel-answer">
-        <div class="answer-hdr">
-          <h3>📋 Phiếu trả lời</h3>
-          <span class="answer-status" id="answer-status">0/0 câu</span>
-        </div>
         <div class="answer-content" id="answer-content"></div>
         <div class="result-panel hidden" id="result-panel">
           <div class="result-circle-wrap">

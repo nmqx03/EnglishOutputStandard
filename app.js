@@ -1,27 +1,15 @@
 /* ============================================================
-   Ôn Thi Tiếng Anh HUMG – app.js
-   Fully hardcoded – no AI API needed
+   Ôn Thi Tiếng Anh HUMG – app.js  (no PDF viewer)
    ============================================================ */
 (() => {
 'use strict';
 
 // ── STATE ────────────────────────────────────────────────────
 const S = {
-  exam: null, pages: [], curPage: 0, zoom: 1.0,
+  exam: null,
   answers: {}, submitted: false,
 };
 const LS_KEY = (n) => `humg_v2_exam_${n}`;
-
-// ── ACTIVE AUDIO (singleton – only one playing at a time) ────
-let activeAudioCtx = null; // { audio, playBtn, progressFill }
-function stopActiveAudio() {
-  if (!activeAudioCtx) return;
-  const { audio, playBtn, progressFill } = activeAudioCtx;
-  if (!audio.paused) audio.pause();
-  playBtn.textContent = '▶';
-  playBtn.classList.remove('playing');
-  activeAudioCtx = null;
-}
 
 // ── DOM ──────────────────────────────────────────────────────
 const $  = (id) => document.getElementById(id);
@@ -31,22 +19,29 @@ const homeScreen    = $('home-screen');
 const examScreen    = $('exam-screen');
 const examGrid      = $('exam-grid');
 const navTitle      = $('nav-title');
-const pdfImg        = $('pdf-img');
-const pdfImgWrap    = $('pdf-img-wrap');
-const thumbStrip    = $('thumb-strip');
-const pageInd       = $('page-indicator');
-const zoomVal       = $('zoom-val');
 const answerContent = $('answer-content');
 const answerStatus  = $('answer-status');
 const resultPanel   = $('result-panel');
 const scoreBadge    = $('score-badge');
 const scoreText     = $('score-text');
 
+// ── SAVE / LOAD ───────────────────────────────────────────────
+function save(scoreData) {
+  try {
+    localStorage.setItem(LS_KEY(S.exam), JSON.stringify({
+      answers: S.answers, submitted: S.submitted,
+      score: scoreData || null, ts: Date.now()
+    }));
+  } catch(e) {}
+}
+function loadSaved(n) {
+  try { return JSON.parse(localStorage.getItem(LS_KEY(n))); } catch(e) { return null; }
+}
+
 // ── HOME ─────────────────────────────────────────────────────
 function buildHome() {
   examGrid.innerHTML = '';
   for (let i = 1; i <= 20; i++) {
-    const pages = (EXAM_DATA[i] || []).length;
     const saved = loadSaved(i);
     const done  = saved?.submitted;
     const score = saved?.score;
@@ -59,40 +54,17 @@ function buildHome() {
       : '';
     card.innerHTML = `
       <div class="card-num">Đề số</div>
-      <div class="card-title">${String(i).padStart(2,'0')}</div>
-      <div class="card-tags">
-        <span class="tag tag-rw">Reading</span>
-        <span class="tag tag-rw">Writing</span>
-        <span class="tag tag-ls">Listening</span>
-      </div>
-      <div class="card-pages">${pages} trang</div>
+      <div class="card-title">${i}</div>
       ${scoreHtml}
-      <div class="card-done">✓ Đã làm</div>`;
+      <div class="card-arrow">→</div>`;
     card.addEventListener('click', () => openExam(i));
     examGrid.appendChild(card);
   }
 }
 
-// ── SAVE / LOAD ───────────────────────────────────────────────
-function loadSaved(n) {
-  try { return JSON.parse(localStorage.getItem(LS_KEY(n)) || 'null'); } catch { return null; }
-}
-function save(scoreData) {
-  try {
-    const prev = loadSaved(S.exam) || {};
-    const payload = { answers: S.answers, submitted: S.submitted };
-    if (scoreData) payload.score = scoreData;
-    else if (prev.score) payload.score = prev.score;
-    localStorage.setItem(LS_KEY(S.exam), JSON.stringify(payload));
-  } catch {}
-}
-
-// ── OPEN EXAM ─────────────────────────────────────────────────
+// ── OPEN EXAM ────────────────────────────────────────────────
 function openExam(num) {
-  const pages = EXAM_DATA[num];
-  if (!pages?.length) { alert('Không tìm thấy dữ liệu đề ' + num); return; }
-
-  S.exam = num; S.pages = pages; S.curPage = 0; S.zoom = 1.0;
+  S.exam = num;
   S.answers = {}; S.submitted = false;
 
   const saved = loadSaved(num);
@@ -103,47 +75,41 @@ function openExam(num) {
   homeScreen.classList.add('hidden');
   examScreen.classList.remove('hidden');
 
-  buildThumbs();
-  showPage(0);
   renderAnswerSheet();
   updateUI();
-
   if (S.submitted) markAnswers();
 }
 
-// ── PDF VIEWER ────────────────────────────────────────────────
-function buildThumbs() {
-  thumbStrip.innerHTML = '';
-  S.pages.forEach((src, i) => {
-    const div = CE('div', { className: 'thumb-item' + (i === 0 ? ' active' : '') });
-    const img = CE('img', { src, loading: 'lazy', alt: `Trang ${i + 1}` });
-    div.appendChild(img);
-    div.addEventListener('click', () => showPage(i));
-    thumbStrip.appendChild(div);
-  });
-}
+// ── RENDER PART IMAGE ─────────────────────────────────────────
+// Renders an image for a part if part.imgSrc is set.
+// Falls back trying .jpg → .png → .jpeg if no extension.
+function renderPartImage(part) {
+  if (!part.imgSrc) return null;
+  const wrap = CE('div', { className: 'part-img-wrap' });
+  const img  = CE('img',  { className: 'part-img', alt: 'Ảnh đề bài' });
 
-function showPage(idx) {
-  if (idx < 0 || idx >= S.pages.length) return;
-  S.curPage = idx;
-  pdfImg.src = S.pages[idx];
-  pdfImgWrap.style.transform = `scale(${S.zoom})`;
-  pdfImgWrap.style.transformOrigin = 'top center';
-  pageInd.textContent = `${idx + 1} / ${S.pages.length}`;
-  $('btn-prev-page').disabled = idx === 0;
-  $('btn-next-page').disabled = idx >= S.pages.length - 1;
-  thumbStrip.querySelectorAll('.thumb-item').forEach((el, i) => {
-    el.classList.toggle('active', i === idx);
-    if (i === idx) el.scrollIntoView({ inline: 'nearest' });
-  });
-  $('pdf-viewer').scrollTop = 0;
-  $('pdf-viewer').scrollLeft = 0;
-}
+  const src = part.imgSrc;
+  const hasExt = /\.(jpg|jpeg|png|gif|webp)$/i.test(src);
 
-function setZoom(z) {
-  S.zoom = Math.max(0.4, Math.min(3, z));
-  pdfImgWrap.style.transform = `scale(${S.zoom})`;
-  zoomVal.textContent = Math.round(S.zoom * 100) + '%';
+  if (hasExt) {
+    img.src = src;
+  } else {
+    // Try extensions in order
+    const exts = ['.jpg', '.png', '.jpeg'];
+    let idx = 0;
+    img.src = src + exts[idx];
+    img.onerror = () => {
+      idx++;
+      if (idx < exts.length) { img.src = src + exts[idx]; }
+      else {
+        wrap.classList.add('part-img-missing');
+        wrap.innerHTML = `<span class="part-img-placeholder">📷 ${src}</span>`;
+      }
+    };
+  }
+
+  wrap.appendChild(img);
+  return wrap;
 }
 
 // ── RENDER ANSWER SHEET ───────────────────────────────────────
@@ -158,19 +124,27 @@ function renderAnswerSheet() {
   }
 
   data.sections.forEach(sec => {
-    // Section header
     const sh = CE('div', { className: 'sec-hdr', textContent: sec.label });
     answerContent.appendChild(sh);
 
     (sec.parts || []).forEach(part => {
       const blk = CE('div', { className: 'part-blk' });
+
+      // Instruction text
       if (part.instruction) {
         blk.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
       }
+
+      // Audio player (for listening parts)
       if (part.audioSrc) {
         blk.appendChild(renderAudioPlayer(part.audioSrc, part.id));
       }
 
+      // Part image (e.g. passage, form, notice board)
+      const imgEl = renderPartImage(part);
+      if (imgEl) blk.appendChild(imgEl);
+
+      // Questions
       switch (part.type) {
         case 'matching':   blk.appendChild(renderMatching(sec.id, part)); break;
         case 'mcq':        blk.appendChild(renderMCQ(sec.id, part)); break;
@@ -184,8 +158,114 @@ function renderAnswerSheet() {
     });
   });
 
-  // Restore saved answers
   if (Object.keys(S.answers).length) restoreAnswers();
+}
+
+// ── AUDIO PLAYER ─────────────────────────────────────────────
+let activeAudioCtx = null;
+
+function stopActiveAudio() {
+  if (!activeAudioCtx) return;
+  const { audio, playBtn, progressFill } = activeAudioCtx;
+  audio.pause();
+  playBtn.textContent = '▶';
+  playBtn.classList.remove('playing');
+  if (progressFill) progressFill.style.width = '0%';
+  activeAudioCtx = null;
+}
+
+function renderAudioPlayer(baseSrc, partId) {
+  const wrap = CE('div', { className: 'audio-player-wrap' });
+  const player = CE('div', { className: 'audio-player' });
+
+  const playBtn = CE('button', { className: 'audio-play-btn', textContent: '▶', title: 'Phát / Dừng' });
+  const progWrap = CE('div', { className: 'audio-progress-wrap' });
+  const progBar  = CE('div', { className: 'audio-progress-bar' });
+  const progFill = CE('div', { className: 'audio-progress-fill' });
+  const timeEl   = CE('span', { className: 'audio-time', textContent: '0:00 / 0:00' });
+  const speedSel = CE('select', { className: 'audio-speed' });
+  [['0.75×','0.75'],['1×','1'],['1.25×','1.25'],['1.5×','1.5']].forEach(([label, val]) => {
+    const opt = CE('option', { value: val, textContent: label });
+    if (val === '1') opt.selected = true;
+    speedSel.appendChild(opt);
+  });
+
+  progBar.appendChild(progFill);
+  progWrap.appendChild(progBar);
+  player.append(playBtn, progWrap, timeEl, speedSel);
+  wrap.appendChild(player);
+
+  let audio = null;
+  let ready = false;
+
+  function fmt(t) {
+    const m = Math.floor(t / 60), s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  function initAudio() {
+    if (audio) return;
+    audio = new Audio();
+    audio.preload = 'metadata';
+    const exts = ['.mp3', '.ogg', '.wav', '.m4a'];
+    let idx = 0;
+    audio.src = baseSrc + exts[idx];
+    audio.onerror = () => {
+      idx++;
+      if (idx < exts.length) { audio.src = baseSrc + exts[idx]; }
+      else {
+        playBtn.disabled = true;
+        playBtn.textContent = '⚠';
+        playBtn.title = 'Không tìm thấy file audio';
+      }
+    };
+    audio.addEventListener('loadedmetadata', () => {
+      timeEl.textContent = `0:00 / ${fmt(audio.duration)}`;
+      ready = true;
+    });
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progFill.style.width = pct + '%';
+      timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+    });
+    audio.addEventListener('ended', () => {
+      playBtn.textContent = '▶';
+      playBtn.classList.remove('playing');
+      progFill.style.width = '0%';
+      if (activeAudioCtx?.audio === audio) activeAudioCtx = null;
+    });
+  }
+
+  playBtn.addEventListener('click', () => {
+    initAudio();
+    if (!audio.paused) {
+      audio.pause();
+      playBtn.textContent = '▶';
+      playBtn.classList.remove('playing');
+      if (activeAudioCtx?.audio === audio) activeAudioCtx = null;
+    } else {
+      stopActiveAudio();
+      audio.play().catch(() => {});
+      playBtn.textContent = '⏸';
+      playBtn.classList.add('playing');
+      activeAudioCtx = { audio, playBtn, progressFill: progFill };
+    }
+  });
+
+  progWrap.addEventListener('click', (e) => {
+    initAudio();
+    if (!audio.duration) return;
+    const rect = progWrap.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+  });
+
+  speedSel.addEventListener('change', () => {
+    initAudio();
+    audio.playbackRate = parseFloat(speedSel.value);
+  });
+
+  return wrap;
 }
 
 // ── MCQ ───────────────────────────────────────────────────────
@@ -195,18 +275,14 @@ function renderMCQ(secId, part) {
     const qk = key(secId, part.id, q.num);
     const row = CE('div', { className: 'q-row', id: `qrow_${qk}` });
 
-    // Stem
+    const stem = CE('div', { className: 'q-stem' });
     if (q.stem && !q.stem.match(/^\d+$/)) {
-      const stem = CE('div', { className: 'q-stem' });
       stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}`;
-      row.appendChild(stem);
     } else {
-      const stem = CE('div', { className: 'q-stem' });
       stem.innerHTML = `<span class="q-num">${q.num}.</span>`;
-      row.appendChild(stem);
     }
+    row.appendChild(stem);
 
-    // Choices
     const ch = CE('div', { className: 'choices' });
     const labels = ['A','B','C'];
     (q.opts || []).forEach((opt, idx) => {
@@ -267,104 +343,7 @@ function onMatchChange(e) {
   save();
 }
 
-// ── AUDIO PLAYER ─────────────────────────────────────────────
-function renderAudioPlayer(baseSrc, partId) {
-  const wrap = CE('div', { className: 'audio-player-wrap', id: `audio_${partId}` });
-  const inner = CE('div', { className: 'audio-player' });
-  const playBtn = CE('button', { className: 'audio-play-btn', innerHTML: '▶', title: 'Phát / Dừng' });
-  const timeEl = CE('span', { className: 'audio-time', textContent: '0:00 / 0:00' });
-  const progressWrap = CE('div', { className: 'audio-progress-wrap' });
-  const progressBar = CE('div', { className: 'audio-progress-bar' });
-  const progressFill = CE('div', { className: 'audio-progress-fill' });
-  progressBar.appendChild(progressFill);
-  progressWrap.appendChild(progressBar);
-  const speedSel = CE('select', { className: 'audio-speed' });
-  [['0.75×', 0.75], ['1×', 1], ['1.25×', 1.25], ['1.5×', 1.5]].forEach(([label, val]) => {
-    const opt = CE('option', { value: val, textContent: label });
-    if (val === 1) opt.selected = true;
-    speedSel.appendChild(opt);
-  });
-  inner.appendChild(playBtn);
-  inner.appendChild(progressWrap);
-  inner.appendChild(timeEl);
-  inner.appendChild(speedSel);
-  wrap.appendChild(inner);
-
-  const exts = ['mp3', 'ogg', 'wav', 'm4a'];
-  let audio = null, triedIdx = 0;
-  function fmt(s) { s = Math.floor(s || 0); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
-
-  function initAudio() {
-    if (audio) return;
-    audio = new Audio();
-    audio.preload = 'metadata';
-    function tryNext() {
-      if (triedIdx >= exts.length) {
-        playBtn.textContent = '⚠'; playBtn.title = 'Không tìm thấy file audio'; playBtn.disabled = true; return;
-      }
-      audio.src = `${baseSrc}.${exts[triedIdx++]}`; audio.load();
-    }
-    audio.onerror = tryNext;
-    audio.addEventListener('loadedmetadata', () => { timeEl.textContent = `0:00 / ${fmt(audio.duration)}`; });
-    audio.addEventListener('timeupdate', () => {
-      const pct = audio.duration ? (audio.currentTime / audio.duration * 100) : 0;
-      progressFill.style.width = pct + '%';
-      timeEl.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
-    });
-    audio.addEventListener('ended', () => {
-      playBtn.textContent = '▶'; playBtn.classList.remove('playing');
-      progressFill.style.width = '0%';
-      if (activeAudioCtx?.audio === audio) activeAudioCtx = null;
-    });
-    tryNext();
-  }
-
-  playBtn.addEventListener('click', () => {
-    initAudio();
-    if (audio.paused) {
-      // Stop whichever other audio is playing
-      stopActiveAudio();
-      audio.play().then(() => {
-        playBtn.textContent = '⏸'; playBtn.classList.add('playing');
-        activeAudioCtx = { audio, playBtn, progressFill };
-      }).catch(() => {});
-    } else {
-      audio.pause(); playBtn.textContent = '▶'; playBtn.classList.remove('playing');
-      if (activeAudioCtx?.audio === audio) activeAudioCtx = null;
-    }
-  });
-
-  progressWrap.addEventListener('click', (e) => {
-    initAudio();
-    if (!audio.duration) return;
-    const rect = progressWrap.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-  });
-  speedSel.addEventListener('change', () => { if (audio) audio.playbackRate = parseFloat(speedSel.value); });
-  return wrap;
-}
-
-// ── IMAGE LOADER (tries extensions if none present) ──────────
-function loadImgWithFallback(img, imgWrap, baseSrc) {
-  const hasExt = /\.(jpe?g|png|gif|webp)$/i.test(baseSrc);
-  if (hasExt) {
-    img.src = baseSrc;
-    img.onerror = () => { imgWrap.classList.add('fill-img-missing'); imgWrap.innerHTML = `<span class="fill-img-placeholder">📷 Ảnh đề: ${baseSrc}</span>`; };
-    return;
-  }
-  const exts = ['jpg', 'png', 'jpeg'];
-  let idx = 0;
-  function tryNext() {
-    if (idx >= exts.length) { imgWrap.classList.add('fill-img-missing'); imgWrap.innerHTML = `<span class="fill-img-placeholder">📷 Ảnh đề: ${baseSrc}</span>`; return; }
-    img.src = `${baseSrc}.${exts[idx++]}`; img.onerror = tryNext;
-  }
-  img.onerror = tryNext;
-  img.src = `${baseSrc}.${exts[idx++]}`;
-}
-
 // ── WORD FILL / TEXT FILL ────────────────────────────────────
-// Supports part.groups = [{label, imgSrc, nums:[41,42,43,44]}, ...]
-// If no groups defined, renders all questions flat (legacy)
 function renderWordFill(secId, part) {
   const wrap = CE('div');
   const questions = part.questions || [];
@@ -373,33 +352,42 @@ function renderWordFill(secId, part) {
   if (part.groups && part.groups.length) {
     part.groups.forEach(grp => {
       const grpWrap = CE('div', { className: 'fill-group' });
-
-      // Group label
       if (grp.label) {
         grpWrap.appendChild(CE('div', { className: 'fill-group-label', textContent: grp.label }));
       }
 
-      // Excerpt image
-      const imgSrc = grp.imgSrc || `images/exam${examNum}_${part.id}_${grp.nums[0]}.jpg`;
-      const imgWrap = CE('div', { className: 'fill-img-wrap' });
-      const img = CE('img', { className: 'fill-img', alt: `Đề ${examNum}` });
-      loadImgWithFallback(img, imgWrap, imgSrc);
-      imgWrap.appendChild(img);
-      grpWrap.appendChild(imgWrap);
+      // Group-level image
+      if (grp.imgSrc) {
+        const imgWrap = CE('div', { className: 'fill-img-wrap' });
+        const img = CE('img', { className: 'fill-img', alt: `Đề ${examNum}` });
+        loadImgWithFallback(img, imgWrap, grp.imgSrc);
+        imgWrap.appendChild(img);
+        grpWrap.appendChild(imgWrap);
+      }
 
-      // Questions for this group
       const grpNums = new Set(grp.nums);
       questions.filter(q => grpNums.has(q.num)).forEach(q => {
         grpWrap.appendChild(buildFillRow(secId, part, q));
       });
-
       wrap.appendChild(grpWrap);
     });
   } else {
-    // Flat legacy
     questions.forEach(q => wrap.appendChild(buildFillRow(secId, part, q)));
   }
   return wrap;
+}
+
+function loadImgWithFallback(img, wrap, baseSrc) {
+  const hasExt = /\.(jpg|jpeg|png|gif|webp)$/i.test(baseSrc);
+  if (hasExt) { img.src = baseSrc; return; }
+  const exts = ['.jpg', '.png', '.jpeg'];
+  let idx = 0;
+  img.src = baseSrc + exts[idx];
+  img.onerror = () => {
+    idx++;
+    if (idx < exts.length) { img.src = baseSrc + exts[idx]; }
+    else { wrap.classList.add('fill-img-missing'); wrap.innerHTML = `<span class="fill-img-placeholder">📷 ${baseSrc}</span>`; }
+  };
 }
 
 function buildFillRow(secId, part, q) {
@@ -425,23 +413,22 @@ function buildFillRow(secId, part, q) {
 }
 
 // ── FORM FILL ─────────────────────────────────────────────────
-// Supports optional part.imgSrc for a form image above the fields
 function renderFormFill(secId, part) {
   const wrap = CE('div');
   const examNum = S.exam;
   const grp = CE('div', { className: 'fill-group' });
 
-  // Group label
   const lbText = part.form_title || 'Questions 51–55';
   grp.appendChild(CE('div', { className: 'fill-group-label', textContent: lbText }));
 
-  // Excerpt image
-  const imgSrc = part.imgSrc || `images/exam${examNum}_${part.id}.jpg`;
-  const imgWrap = CE('div', { className: 'fill-img-wrap' });
-  const img = CE('img', { className: 'fill-img', alt: `Form đề ${examNum}` });
-  loadImgWithFallback(img, imgWrap, imgSrc);
-  imgWrap.appendChild(img);
-  grp.appendChild(imgWrap);
+  // Form image (part.imgSrc)
+  if (part.imgSrc) {
+    const imgWrap = CE('div', { className: 'fill-img-wrap' });
+    const img = CE('img', { className: 'fill-img', alt: `Form đề ${examNum}` });
+    loadImgWithFallback(img, imgWrap, part.imgSrc);
+    imgWrap.appendChild(img);
+    grp.appendChild(imgWrap);
+  }
 
   (part.questions || []).forEach(q => {
     const k = key(secId, part.id, q.num);
@@ -501,7 +488,6 @@ function restoreAnswers() {
   Object.entries(S.answers).forEach(([k, val]) => {
     if (!val) return;
     const [secId, partId, num] = k.split('_');
-    // MCQ button
     const btn = answerContent.querySelector(`.cbtn[data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
     if (btn) {
       answerContent.querySelectorAll(`.cbtn[data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`)
@@ -509,10 +495,8 @@ function restoreAnswers() {
       btn.classList.add('selected');
       return;
     }
-    // Matching select
     const sel = $(`sel_${k}`);
     if (sel) { sel.value = val; return; }
-    // Input / textarea
     const inp = $(`inp_${k}`);
     if (inp) {
       inp.value = val;
@@ -532,8 +516,7 @@ function countAnswers() {
   data.sections.forEach(sec => {
     (sec.parts || []).forEach(part => {
       if (part.type === 'writing') return;
-      const items = part.type === 'matching' ? part.questions : part.questions;
-      (items || []).forEach(q => {
+      (part.questions || []).forEach(q => {
         total++;
         const k = key(sec.id, part.id, q.num);
         if (S.answers[k]) done++;
@@ -561,7 +544,6 @@ function markAnswers() {
   const data = QUESTIONS[S.exam];
   if (!data) return;
 
-  // Disable all inputs
   answerContent.querySelectorAll('.cbtn, .match-sel, input, textarea')
     .forEach(el => { el.disabled = true; });
 
@@ -611,8 +593,8 @@ function markAnswers() {
             : [(q.ans || '').toLowerCase().trim()];
           if (q.alts) q.alts.forEach(a => accepted.push(a.toLowerCase().trim()));
           const isOk = userLow !== '' && accepted.some(a => a && userLow === a);
-          const displayAns = Array.isArray(q.ans) ? q.ans.join(' / ') : (q.ans || '');
-          const hasAns = Array.isArray(q.ans) ? q.ans.some(a => a) : !!q.ans;
+          const displayAns = Array.isArray(q.ans) ? q.ans.join(' / ') : q.ans;
+          const hasAns = Array.isArray(q.ans) ? q.ans.length > 0 : !!q.ans;
           if (inp && hasAns) inp.classList.add(isOk ? 'correct-fill' : 'wrong-fill');
           if (fb && hasAns) {
             fb.className = 'q-fb ' + (isOk ? 'ok' : 'bad');
@@ -648,7 +630,6 @@ function showResults() {
 
       (part.questions || []).forEach(q => {
         const user = (S.answers[key(sec.id, part.id, q.num)] || '').toLowerCase().trim();
-        // Build accepted list
         const accepted = Array.isArray(q.ans)
           ? q.ans.map(a => a.toLowerCase().trim())
           : [(q.ans || '').toLowerCase().trim()];
@@ -710,11 +691,6 @@ $('btn-back').addEventListener('click', () => {
   buildHome();
 });
 
-$('btn-prev-page').addEventListener('click', () => showPage(S.curPage - 1));
-$('btn-next-page').addEventListener('click', () => showPage(S.curPage + 1));
-$('btn-zoom-in').addEventListener('click', () => setZoom(S.zoom + 0.15));
-$('btn-zoom-out').addEventListener('click', () => setZoom(S.zoom - 0.15));
-
 $('btn-submit').addEventListener('click', () => $('modal-submit').classList.remove('hidden'));
 $('modal-cancel').addEventListener('click', () => $('modal-submit').classList.add('hidden'));
 $('modal-confirm').addEventListener('click', () => {
@@ -724,19 +700,15 @@ $('modal-confirm').addEventListener('click', () => {
   markAnswers();
   const scoreData = showResults();
   save(scoreData);
-  // Update home card immediately with score
   const cards = examGrid.querySelectorAll('.exam-card');
-  const card = cards[S.exam - 1];
-  if (card) {
-    card.classList.add('done');
-    const existing = card.querySelector('.card-score');
-    if (existing) existing.remove();
+  if (cards[S.exam - 1]) {
+    cards[S.exam - 1].classList.add('done');
     if (scoreData) {
-      const scoreDiv = CE('div', {
-        className: `card-score ${scoreData.pct >= 70 ? 'score-hi' : scoreData.pct >= 40 ? 'score-mid' : 'score-lo'}`
-      });
-      scoreDiv.innerHTML = `<span class="score-num">${scoreData.correct}/${scoreData.total}</span><span class="score-pct">${scoreData.pct}%</span>`;
-      card.appendChild(scoreDiv);
+      const cls = scoreData.pct >= 70 ? 'score-hi' : scoreData.pct >= 40 ? 'score-mid' : 'score-lo';
+      let sc = cards[S.exam - 1].querySelector('.card-score');
+      if (!sc) { sc = CE('div', { className: `card-score ${cls}` }); cards[S.exam - 1].appendChild(sc); }
+      sc.className = `card-score ${cls}`;
+      sc.innerHTML = `<span class="score-num">${scoreData.correct}/${scoreData.total}</span><span class="score-pct">${scoreData.pct}%</span>`;
     }
   }
 });
@@ -751,34 +723,9 @@ $('btn-review').addEventListener('click', () => {
 });
 $('btn-retry').addEventListener('click', resetExam);
 
-// Nav tabs (mobile)
-document.querySelectorAll('.nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const t = tab.dataset.tab;
-    $('panel-exam').style.display = t === 'answer' ? 'none' : '';
-    $('panel-answer').classList.toggle('open', t === 'answer');
-  });
-});
-
-// Keyboard
 document.addEventListener('keydown', e => {
   if (examScreen.classList.contains('hidden')) return;
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); showPage(S.curPage + 1); }
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); showPage(S.curPage - 1); }
-  if (e.key === '+' || e.key === '=') setZoom(S.zoom + 0.15);
-  if (e.key === '-') setZoom(S.zoom - 0.15);
   if (e.key === 'Escape') $('modal-submit').classList.add('hidden');
-});
-
-// Touch swipe
-let tx0 = 0;
-$('pdf-viewer').addEventListener('touchstart', e => { tx0 = e.touches[0].clientX; }, { passive: true });
-$('pdf-viewer').addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - tx0;
-  if (Math.abs(dx) > 55) showPage(dx < 0 ? S.curPage + 1 : S.curPage - 1);
 });
 
 // ── INIT ──────────────────────────────────────────────────────
