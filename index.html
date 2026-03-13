@@ -4,78 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ôn Thi Tiếng Anh – HUMG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- HOME -->
   <div id="home-screen">
-    <div class="home-bg"></div>
     <header class="home-header">
-      <div class="logo-badge">HUMG</div>
-      <h1>Ôn Chuẩn Đầu Ra<br><span>Ngoại Ngữ</span></h1>
-      <p class="subtitle">Bộ 20 đề · Khoanh đáp án · Điền bài · Tự chấm điểm</p>
+      <div class="home-badge">
+        <span class="badge-dot"></span>
+        HUMG · Bộ đề tiếng Anh
+      </div>
+      <h1>Ôn Chuẩn Đầu Ra<br><em>Ngoại Ngữ</em></h1>
+      <p class="subtitle">20 đề luyện tập · Tự chấm điểm tức thì</p>
     </header>
     <div class="exam-grid" id="exam-grid"></div>
     <footer class="home-footer">Fb: Chu Hiền Anh · 0337082255</footer>
   </div>
 
-  <!-- EXAM SCREEN -->
+  <!-- EXAM POPUP (overlay) -->
   <div id="exam-screen" class="hidden">
-    <nav class="exam-nav">
-      <button id="btn-back" class="btn-back">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-        Danh sách đề
-      </button>
-      <div class="nav-center">
-        <span id="nav-title">Đề 1</span>
-      </div>
-      <div class="nav-right">
-        <div class="score-badge hidden" id="score-badge"><span id="score-text">0/0</span></div>
-        <span class="answer-status" id="answer-status">0/0 câu</span>
-        <button class="btn-submit" id="btn-submit">Nộp bài</button>
-        <button class="btn-icon-nav" id="btn-reset" title="Làm lại">↺</button>
-      </div>
-    </nav>
+    <div class="exam-popup">
 
-    <div class="exam-body">
-      <div class="answer-panel" id="panel-answer">
-        <div class="answer-content" id="answer-content"></div>
-        <div class="result-panel hidden" id="result-panel">
-          <div class="result-circle-wrap">
-            <svg class="result-svg" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
-              <circle id="result-arc" cx="60" cy="60" r="50" fill="none" stroke="#f59e0b" stroke-width="10"
-                stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
-                transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1.2s ease"/>
-            </svg>
-            <div class="result-center">
-              <span id="result-pct">0%</span><small>điểm</small>
+      <nav class="exam-nav">
+        <button id="btn-back" class="btn-back">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Đề thi
+        </button>
+        <div class="nav-center">
+          <span id="nav-title">Đề 1</span>
+        </div>
+        <div class="nav-right">
+          <span class="answer-status" id="answer-status">0/55</span>
+          <div class="score-badge hidden" id="score-badge"><span id="score-text">0/0</span></div>
+          <button class="btn-submit" id="btn-submit">Nộp bài</button>
+          <button class="btn-icon-nav" id="btn-reset" title="Làm lại">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+        </div>
+      </nav>
+
+      <div class="exam-body">
+        <div class="answer-panel">
+          <div class="answer-content" id="answer-content"></div>
+          <div class="result-panel hidden" id="result-panel">
+            <div class="result-circle-wrap">
+              <svg class="result-svg" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(37,99,235,.08)" stroke-width="9"/>
+                <circle id="result-arc" cx="60" cy="60" r="50" fill="none" stroke="#2563eb" stroke-width="9"
+                  stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+                  transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1.2s ease"/>
+              </svg>
+              <div class="result-center">
+                <span id="result-pct">0%</span><small>điểm</small>
+              </div>
             </div>
-          </div>
-          <div class="result-stats">
-            <div class="stat-item correct">✅ Đúng <strong id="res-correct">0</strong></div>
-            <div class="stat-item wrong">❌ Sai <strong id="res-wrong">0</strong></div>
-            <div class="stat-item skip">⬜ Bỏ <strong id="res-skip">0</strong></div>
-          </div>
-          <div class="result-actions">
-            <button class="btn-review" id="btn-review">👁 Xem đáp án</button>
-            <button class="btn-retry" id="btn-retry">🔄 Làm lại</button>
+            <div class="result-stats">
+              <div class="stat-item correct">✓ Đúng <strong id="res-correct">0</strong></div>
+              <div class="stat-item wrong">✗ Sai <strong id="res-wrong">0</strong></div>
+              <div class="stat-item skip">— Bỏ <strong id="res-skip">0</strong></div>
+            </div>
+            <div class="result-actions">
+              <button class="btn-review" id="btn-review">Xem đáp án</button>
+              <button class="btn-retry" id="btn-retry">Làm lại</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+
+    </div><!-- .exam-popup -->
+  </div><!-- #exam-screen -->
 
   <!-- Submit modal -->
   <div class="modal-overlay hidden" id="modal-submit">
     <div class="modal">
-      <div class="modal-icon">📤</div>
-      <h3>Nộp bài kiểm tra?</h3>
+      <div class="modal-icon">📋</div>
+      <h3>Nộp bài?</h3>
       <p>Còn <strong id="unanswered-count" class="warn-text">0</strong> câu chưa trả lời.</p>
       <div class="modal-btns">
-        <button class="modal-btn secondary" id="modal-cancel">Tiếp tục làm</button>
-        <button class="modal-btn primary" id="modal-confirm">✅ Nộp bài</button>
+        <button class="modal-btn secondary" id="modal-cancel">Làm tiếp</button>
+        <button class="modal-btn primary" id="modal-confirm">Nộp bài</button>
       </div>
     </div>
   </div>

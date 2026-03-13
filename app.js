@@ -53,7 +53,7 @@ function buildHome() {
          </div>`
       : '';
     card.innerHTML = `
-      <div class="card-num">Đề số</div>
+      <div class="card-num">Đề</div>
       <div class="card-title">${i}</div>
       ${scoreHtml}
       <div class="card-arrow">→</div>`;
@@ -72,7 +72,8 @@ function openExam(num) {
 
   navTitle.textContent = `Đề ${num}`;
   document.title = `Đề ${num} – Ôn Thi Tiếng Anh HUMG`;
-  homeScreen.classList.add('hidden');
+
+  // Show as popup over home screen
   examScreen.classList.remove('hidden');
 
   renderAnswerSheet();
@@ -80,36 +81,116 @@ function openExam(num) {
   if (S.submitted) markAnswers();
 }
 
-// ── RENDER PART IMAGE ─────────────────────────────────────────
-// Renders an image for a part if part.imgSrc is set.
-// Falls back trying .jpg → .png → .jpeg if no extension.
+// ── IMAGE LIGHTBOX ───────────────────────────────────────────
+// makePartImgEl: creates a tappable image thumbnail.
+// Clicking opens fullscreen lightbox with pinch-zoom support.
+function makePartImgEl(src, alt) {
+  const wrap = CE('div', { className: 'part-img-wrap' });
+  const img  = CE('img',  { className: 'part-img', alt: alt || 'Ảnh đề bài' });
+  loadImgWithFallback(img, wrap, src);
+  // Zoom icon
+  const icon = CE('div', { className: 'part-img-icon', innerHTML: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>' });
+  wrap.appendChild(img);
+  wrap.appendChild(icon);
+  wrap.addEventListener('click', () => openLightbox(img.src));
+  return wrap;
+}
+
+// renderPartImage: thin wrapper for parts with imgSrc field
 function renderPartImage(part) {
   if (!part.imgSrc) return null;
-  const wrap = CE('div', { className: 'part-img-wrap' });
-  const img  = CE('img',  { className: 'part-img', alt: 'Ảnh đề bài' });
+  return makePartImgEl(part.imgSrc, 'Ảnh đề bài');
+}
 
-  const src = part.imgSrc;
-  const hasExt = /\.(jpg|jpeg|png|gif|webp)$/i.test(src);
+// ── LIGHTBOX ──────────────────────────────────────────────────
+let lbScale = 1, lbPinchDist0 = null, lbPanX = 0, lbPanY = 0, lbDragStartX, lbDragStartY, lbPanX0, lbPanY0;
 
-  if (hasExt) {
-    img.src = src;
-  } else {
-    // Try extensions in order
-    const exts = ['.jpg', '.png', '.jpeg'];
-    let idx = 0;
-    img.src = src + exts[idx];
-    img.onerror = () => {
-      idx++;
-      if (idx < exts.length) { img.src = src + exts[idx]; }
-      else {
-        wrap.classList.add('part-img-missing');
-        wrap.innerHTML = `<span class="part-img-placeholder">📷 ${src}</span>`;
-      }
-    };
+function openLightbox(src) {
+  const overlay = CE('div', { className: 'lb-overlay', id: 'lb-overlay' });
+  const inner   = CE('div', { className: 'lb-inner' });
+  const img     = CE('img',  { className: 'lb-img', src, alt: 'Ảnh đề bài' });
+  const closeBtn = CE('button', { className: 'lb-close', textContent: '✕' });
+
+  inner.appendChild(img);
+  const hint = CE('div', { className: 'lb-hint', textContent: 'Kéo 2 ngón để zoom · Vuốt để di chuyển · Esc để đóng' });
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(inner);
+  overlay.appendChild(hint);
+  document.body.appendChild(overlay);
+
+  lbScale = 1; lbPanX = 0; lbPanY = 0;
+
+  function applyTransform() {
+    img.style.transform = `scale(${lbScale}) translate(${lbPanX / lbScale}px, ${lbPanY / lbScale}px)`;
   }
 
-  wrap.appendChild(img);
-  return wrap;
+  function close() { overlay.remove(); }
+  closeBtn.addEventListener('click', close);
+  // Click anywhere outside the image (on overlay or inner background) closes lightbox
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay || e.target === inner) close();
+  });
+  document.addEventListener('keydown', function onKey(e) {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); }
+  });
+
+  // ── Touch: pinch-to-zoom + drag ──
+  overlay.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lbPinchDist0 = Math.hypot(dx, dy);
+      lbPanX0 = lbPanX; lbPanY0 = lbPanY;
+    } else if (e.touches.length === 1) {
+      lbDragStartX = e.touches[0].clientX - lbPanX;
+      lbDragStartY = e.touches[0].clientY - lbPanY;
+    }
+  }, { passive: true });
+
+  overlay.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      lbScale = Math.max(1, Math.min(6, lbScale * dist / lbPinchDist0));
+      lbPinchDist0 = dist;
+      applyTransform();
+    } else if (e.touches.length === 1 && lbScale > 1) {
+      lbPanX = e.touches[0].clientX - lbDragStartX;
+      lbPanY = e.touches[0].clientY - lbDragStartY;
+      applyTransform();
+    }
+  }, { passive: false });
+
+  overlay.addEventListener('touchend', e => {
+    if (e.touches.length < 2) lbPinchDist0 = null;
+  }, { passive: true });
+
+  // ── Mouse: wheel zoom + drag ──
+  overlay.addEventListener('wheel', e => {
+    e.preventDefault();
+    lbScale = Math.max(1, Math.min(6, lbScale * (e.deltaY < 0 ? 1.15 : 0.87)));
+    if (lbScale === 1) { lbPanX = 0; lbPanY = 0; }
+    applyTransform();
+  }, { passive: false });
+
+  let dragging = false;
+  img.addEventListener('click', e => { e.stopPropagation(); });
+  img.addEventListener('mousedown', e => {
+    if (lbScale <= 1) return;
+    dragging = true;
+    lbDragStartX = e.clientX - lbPanX;
+    lbDragStartY = e.clientY - lbPanY;
+    img.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    lbPanX = e.clientX - lbDragStartX;
+    lbPanY = e.clientY - lbDragStartY;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => { dragging = false; img.style.cursor = ''; });
 }
 
 // ── RENDER ANSWER SHEET ───────────────────────────────────────
@@ -135,14 +216,24 @@ function renderAnswerSheet() {
         blk.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
       }
 
-      // Audio player (for listening parts)
-      if (part.audioSrc) {
-        blk.appendChild(renderAudioPlayer(part.audioSrc, part.id));
-      }
+      // ls1 special layout: instruction → audio → per-question images inside each q
+      // All other parts: part image → audio → questions
+      const isLs1 = (part.id === 'ls1');
 
-      // Part image (e.g. passage, form, notice board)
-      const imgEl = renderPartImage(part);
-      if (imgEl) blk.appendChild(imgEl);
+      if (isLs1) {
+        // ls1: audio before per-question content; images rendered inside renderMCQ per question
+        if (part.audioSrc) blk.appendChild(renderAudioPlayer(part.audioSrc, part.id));
+      } else {
+        // form_fill and word_fill/text_fill render their own images internally → skip here
+        const selfRendersImg = (part.type === 'form_fill' || part.type === 'word_fill' || part.type === 'text_fill');
+        if (!selfRendersImg) {
+          // Part-level image for mcq, matching, writing, ls4 form, etc.
+          const imgEl = renderPartImage(part);
+          if (imgEl) blk.appendChild(imgEl);
+        }
+        // Audio after image
+        if (part.audioSrc) blk.appendChild(renderAudioPlayer(part.audioSrc, part.id));
+      }
 
       // Questions
       switch (part.type) {
@@ -275,6 +366,13 @@ function renderMCQ(secId, part) {
     const qk = key(secId, part.id, q.num);
     const row = CE('div', { className: 'q-row', id: `qrow_${qk}` });
 
+    // Per-question image (ls1: N.L0105.Q shown above each question)
+    if (q.qImgSrc) {
+      const qImgEl = makePartImgEl(q.qImgSrc, `Câu ${q.num}`);
+      qImgEl.classList.add('q-img-wrap');
+      row.appendChild(qImgEl);
+    }
+
     const stem = CE('div', { className: 'q-stem' });
     if (q.stem && !q.stem.match(/^\d+$/)) {
       stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}`;
@@ -356,13 +454,10 @@ function renderWordFill(secId, part) {
         grpWrap.appendChild(CE('div', { className: 'fill-group-label', textContent: grp.label }));
       }
 
-      // Group-level image
+      // Group-level image → unified clickable part image
       if (grp.imgSrc) {
-        const imgWrap = CE('div', { className: 'fill-img-wrap' });
-        const img = CE('img', { className: 'fill-img', alt: `Đề ${examNum}` });
-        loadImgWithFallback(img, imgWrap, grp.imgSrc);
-        imgWrap.appendChild(img);
-        grpWrap.appendChild(imgWrap);
+        const imgEl = makePartImgEl(grp.imgSrc, `Đề ${examNum}`);
+        grpWrap.appendChild(imgEl);
       }
 
       const grpNums = new Set(grp.nums);
@@ -390,6 +485,11 @@ function loadImgWithFallback(img, wrap, baseSrc) {
   };
 }
 
+// Returns the primary answer string
+function getPrimaryAns(ans) {
+  return (Array.isArray(ans) ? ans[0] : ans) || '';
+}
+
 function buildFillRow(secId, part, q) {
   const k = key(secId, part.id, q.num);
   const row = CE('div', { className: 'fill-row', id: `qrow_${k}` });
@@ -402,11 +502,24 @@ function buildFillRow(secId, part, q) {
   }
 
   const inpRow = CE('div', { className: 'fill-inp-row' });
-  inpRow.appendChild(CE('span', { className: 'fill-num-badge', textContent: `${q.num}.` }));
   const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: 'Nhập từ...', id: `inp_${k}`, autocomplete: 'off' });
   inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
   inp.addEventListener('input', onFillInput);
   inpRow.appendChild(inp);
+  // Q36-40 only: show first letter + blanks for remaining letters
+  if (q.num >= 36 && q.num <= 40) {
+    const primary = getPrimaryAns(q.ans);
+    if (primary.length > 0) {
+      const first = primary[0].toUpperCase();
+      const rest  = primary.length - 1;
+      const hint  = CE('span', { className: 'fill-letter-hint' });
+      hint.innerHTML =
+        `<span class="fill-first">${first}</span>` +
+        (rest > 0 ? `<span class="fill-blanks">${'_ '.repeat(rest).trim()}</span>` : '') +
+        `<span class="fill-count">(${primary.length} chữ cái)</span>`;
+      inpRow.appendChild(hint);
+    }
+  }
   row.appendChild(inpRow);
   row.appendChild(CE('div', { className: 'q-fb', id: `fb_${k}` }));
   return row;
@@ -421,13 +534,9 @@ function renderFormFill(secId, part) {
   const lbText = part.form_title || 'Questions 51–55';
   grp.appendChild(CE('div', { className: 'fill-group-label', textContent: lbText }));
 
-  // Form image (part.imgSrc)
+  // Form image (part.imgSrc) → unified clickable part image
   if (part.imgSrc) {
-    const imgWrap = CE('div', { className: 'fill-img-wrap' });
-    const img = CE('img', { className: 'fill-img', alt: `Form đề ${examNum}` });
-    loadImgWithFallback(img, imgWrap, part.imgSrc);
-    imgWrap.appendChild(img);
-    grp.appendChild(imgWrap);
+    grp.appendChild(makePartImgEl(part.imgSrc, `Form đề ${examNum}`));
   }
 
   (part.questions || []).forEach(q => {
@@ -445,6 +554,7 @@ function renderFormFill(secId, part) {
     inp.addEventListener('input', onFillInput);
     fw.appendChild(inp);
     if (q.suffix) fw.appendChild(CE('span', { className: 'fill-suf', textContent: q.suffix }));
+
     row.appendChild(fw);
     row.appendChild(CE('div', { className: 'q-fb', id: `fb_${k}` }));
     grp.appendChild(row);
@@ -686,9 +796,18 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 $('btn-back').addEventListener('click', () => {
   stopActiveAudio();
   examScreen.classList.add('hidden');
-  homeScreen.classList.remove('hidden');
   document.title = 'Ôn Thi Tiếng Anh – HUMG';
   buildHome();
+});
+
+// Click dim overlay (outside popup box) also closes
+examScreen.addEventListener('click', (e) => {
+  if (e.target === examScreen) {
+    stopActiveAudio();
+    examScreen.classList.add('hidden');
+    document.title = 'Ôn Thi Tiếng Anh – HUMG';
+    buildHome();
+  }
 });
 
 $('btn-submit').addEventListener('click', () => $('modal-submit').classList.remove('hidden'));

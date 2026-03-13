@@ -1,4 +1,3 @@
-// HUMG Exam Questions Data
 const QUESTIONS = {
   "1": {
     "title": "Đề 1",
@@ -73,7 +72,8 @@ const QUESTIONS = {
               "3": "E",
               "4": "A",
               "5": "G"
-            }
+            },
+            "imgSrc": "images/1.RW0105"
           },
           {
             "id": "p2",
@@ -264,7 +264,8 @@ const QUESTIONS = {
                 ],
                 "ans": "B"
               }
-            ]
+            ],
+            "imgSrc": "images/1.RW2127"
           },
           {
             "id": "p5",
@@ -351,7 +352,8 @@ const QUESTIONS = {
                 ],
                 "ans": "B"
               }
-            ]
+            ],
+            "imgSrc": "images/1.RW2835"
           },
           {
             "id": "p6",
@@ -476,8 +478,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/1.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/1.RW4144",
                 "nums": [
                   41,
                   42,
@@ -486,8 +488,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/1.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/1.RW4550",
                 "nums": [
                   45,
                   46,
@@ -557,17 +559,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/1.3"
+            "imgSrc": "images/1.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "You are going to paint your bedroom. Your friend Robbie is going to help you. Write a note to Robbie. Say: what colour paint you are going to use, what time you will start, what clothes to wear. Write 25–35 words."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -588,7 +585,8 @@ const QUESTIONS = {
                   "Position B",
                   "Position C"
                 ],
-                "ans": "A"
+                "ans": "A",
+                "qImgSrc": "images/1.L0105.1"
               },
               {
                 "num": 2,
@@ -598,7 +596,8 @@ const QUESTIONS = {
                   "30 litres",
                   "33 litres"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/1.L0105.2"
               },
               {
                 "num": 3,
@@ -608,7 +607,8 @@ const QUESTIONS = {
                   "A letter",
                   "A newspaper"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/1.L0105.3"
               },
               {
                 "num": 4,
@@ -618,7 +618,8 @@ const QUESTIONS = {
                   "$90",
                   "$99"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/1.L0105.4"
               },
               {
                 "num": 5,
@@ -628,7 +629,8 @@ const QUESTIONS = {
                   "Position B",
                   "Position C"
                 ],
-                "ans": "C"
+                "ans": "C",
+                "qImgSrc": "images/1.L0105.5"
               }
             ],
             "audioSrc": "audio/1.1"
@@ -789,8 +791,8 @@ const QUESTIONS = {
                 "ans": "bank"
               }
             ],
-            "audioSrc": "audio/1.4",
-            "imgSrc": "images/1.4"
+            "imgSrc": "images/1.L1620",
+            "audioSrc": "audio/1.4"
           }
         ]
       }
@@ -869,7 +871,8 @@ const QUESTIONS = {
               "3": "A",
               "4": "G",
               "5": "C"
-            }
+            },
+            "imgSrc": "images/2.RW0105"
           },
           {
             "id": "p2",
@@ -1060,7 +1063,8 @@ const QUESTIONS = {
                 ],
                 "ans": "B"
               }
-            ]
+            ],
+            "imgSrc": "images/2.RW2127"
           },
           {
             "id": "p5",
@@ -1147,7 +1151,8 @@ const QUESTIONS = {
                 ],
                 "ans": "C"
               }
-            ]
+            ],
+            "imgSrc": "images/2.RW2835"
           },
           {
             "id": "p6",
@@ -1268,8 +1273,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/2.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/2.RW4144",
                 "nums": [
                   41,
                   42,
@@ -1278,8 +1283,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/2.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/2.RW4550",
                 "nums": [
                   45,
                   46,
@@ -1347,17 +1352,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/2.3"
+            "imgSrc": "images/2.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Read this note from your friend, Sarah: 'Yes, I would like to play tennis this evening. What time shall we meet at your house? How are we going to get to the sports centre? What do I need to wear?' Write a note to Sarah and answer her questions. Write 25–35 words."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -1378,7 +1378,8 @@ const QUESTIONS = {
                   "By car",
                   "By train"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/2.L0105.1"
               },
               {
                 "num": 2,
@@ -1388,7 +1389,8 @@ const QUESTIONS = {
                   "In the box",
                   "On the chair"
                 ],
-                "ans": "A"
+                "ans": "A",
+                "qImgSrc": "images/2.L0105.2"
               },
               {
                 "num": 3,
@@ -1398,7 +1400,8 @@ const QUESTIONS = {
                   "12.15 p.m.",
                   "2.00 p.m."
                 ],
-                "ans": "C"
+                "ans": "C",
+                "qImgSrc": "images/2.L0105.3"
               },
               {
                 "num": 4,
@@ -1408,7 +1411,8 @@ const QUESTIONS = {
                   "Box B",
                   "Box C"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/2.L0105.4"
               },
               {
                 "num": 5,
@@ -1418,7 +1422,8 @@ const QUESTIONS = {
                   "18 May",
                   "21 May"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/2.L0105.5"
               }
             ],
             "audioSrc": "audio/2.1"
@@ -1544,43 +1549,43 @@ const QUESTIONS = {
             "instruction": "Questions 21-25: Complete the Message form (Susanna).",
             "questions": [
               {
-                "num": 16,
+                "num": 21,
                 "label": "Buy",
                 "prefix": "a white",
                 "suffix": "",
                 "ans": "shirt"
               },
               {
-                "num": 17,
+                "num": 22,
                 "label": "Name of shop",
                 "prefix": "",
                 "suffix": "",
                 "ans": ""
               },
               {
-                "num": 18,
+                "num": 23,
                 "label": "In High Street, next to",
                 "prefix": "",
                 "suffix": "",
                 "ans": ""
               },
               {
-                "num": 19,
+                "num": 24,
                 "label": "Size",
                 "prefix": "",
                 "suffix": "",
                 "ans": ""
               },
               {
-                "num": 20,
+                "num": 25,
                 "label": "Price",
                 "prefix": "£",
                 "suffix": "",
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/2.4",
-            "imgSrc": "images/2.4"
+            "imgSrc": "images/2.L2125",
+            "audioSrc": "audio/2.4"
           }
         ]
       }
@@ -1659,7 +1664,8 @@ const QUESTIONS = {
               "3": "C",
               "4": "G",
               "5": "D"
-            }
+            },
+            "imgSrc": "images/3.RW0105"
           },
           {
             "id": "p2",
@@ -1850,7 +1856,8 @@ const QUESTIONS = {
                 ],
                 "ans": "B"
               }
-            ]
+            ],
+            "imgSrc": "images/3.RW2127"
           },
           {
             "id": "p5",
@@ -1937,7 +1944,8 @@ const QUESTIONS = {
                 ],
                 "ans": "C"
               }
-            ]
+            ],
+            "imgSrc": "images/3.RW2835"
           },
           {
             "id": "p6",
@@ -2057,8 +2065,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/3.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/3.RW4144",
                 "nums": [
                   41,
                   42,
@@ -2067,8 +2075,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/3.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/3.RW4550",
                 "nums": [
                   45,
                   46,
@@ -2137,17 +2145,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/3.3"
+            "imgSrc": "images/3.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Read this note from your friend, Ally: 'Sorry I couldn't come to your birthday party. What did you do at the party? Who was there? What presents did you get?' Write a note to Ally and answer her questions. Write 25–35 words."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -2168,7 +2171,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": "B"
+                "ans": "B",
+                "qImgSrc": "images/3.L0105.1"
               },
               {
                 "num": 2,
@@ -2178,7 +2182,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": "A"
+                "ans": "A",
+                "qImgSrc": "images/3.L0105.2"
               },
               {
                 "num": 3,
@@ -2188,7 +2193,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": "C"
+                "ans": "C",
+                "qImgSrc": "images/3.L0105.3"
               },
               {
                 "num": 4,
@@ -2198,7 +2204,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": "C"
+                "ans": "C",
+                "qImgSrc": "images/3.L0105.4"
               },
               {
                 "num": 5,
@@ -2208,181 +2215,11 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": "A"
+                "ans": "A",
+                "qImgSrc": "images/3.L0105.5"
               }
             ],
             "audioSrc": "audio/3.1"
-          },
-          {
-            "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/3.2"
-          },
-          {
-            "id": "ls3",
-            "type": "mcq",
-            "instruction": "Questions 11-15: Choose A, B or C.",
-            "questions": [
-              {
-                "num": 11,
-                "stem": "(Xem câu 11)",
-                "opts": [
-                  "A",
-                  "B",
-                  "C"
-                ],
-                "ans": ""
-              },
-              {
-                "num": 12,
-                "stem": "(Xem câu 12)",
-                "opts": [
-                  "A",
-                  "B",
-                  "C"
-                ],
-                "ans": ""
-              },
-              {
-                "num": 13,
-                "stem": "(Xem câu 13)",
-                "opts": [
-                  "A",
-                  "B",
-                  "C"
-                ],
-                "ans": ""
-              },
-              {
-                "num": 14,
-                "stem": "(Xem câu 14)",
-                "opts": [
-                  "A",
-                  "B",
-                  "C"
-                ],
-                "ans": ""
-              },
-              {
-                "num": 15,
-                "stem": "(Xem câu 15)",
-                "opts": [
-                  "A",
-                  "B",
-                  "C"
-                ],
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/3.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/3.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/3.5"
           }
         ]
       }
@@ -2456,7 +2293,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/4.RW0105"
           },
           {
             "id": "p2",
@@ -2647,7 +2485,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/4.RW2127"
           },
           {
             "id": "p5",
@@ -2734,7 +2573,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/4.RW2835"
           },
           {
             "id": "p6",
@@ -2854,8 +2694,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/4.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/4.RW4144",
                 "nums": [
                   41,
                   42,
@@ -2864,8 +2704,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/4.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/4.RW4550",
                 "nums": [
                   45,
                   46,
@@ -2928,17 +2768,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/4.3"
+            "imgSrc": "images/4.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -2959,7 +2794,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/4.L0105.1"
               },
               {
                 "num": 2,
@@ -2969,7 +2805,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/4.L0105.2"
               },
               {
                 "num": 3,
@@ -2979,7 +2816,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/4.L0105.3"
               },
               {
                 "num": 4,
@@ -2989,7 +2827,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/4.L0105.4"
               },
               {
                 "num": 5,
@@ -2999,82 +2838,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/4.L0105.5"
               }
             ],
             "audioSrc": "audio/4.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/4.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -3129,51 +2900,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/4.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/4.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/4.4"
+            "audioSrc": "audio/4.2"
           }
         ]
       }
@@ -3247,7 +2974,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/5.RW0105"
           },
           {
             "id": "p2",
@@ -3438,7 +3166,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/5.RW2127"
           },
           {
             "id": "p5",
@@ -3525,7 +3254,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/5.RW2835"
           },
           {
             "id": "p6",
@@ -3644,8 +3374,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/5.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/5.RW4144",
                 "nums": [
                   41,
                   42,
@@ -3654,8 +3384,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/5.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/5.RW4550",
                 "nums": [
                   45,
                   46,
@@ -3719,17 +3449,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/5.3"
+            "imgSrc": "images/5.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -3750,7 +3475,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/5.L0105.1"
               },
               {
                 "num": 2,
@@ -3760,7 +3486,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/5.L0105.2"
               },
               {
                 "num": 3,
@@ -3770,7 +3497,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/5.L0105.3"
               },
               {
                 "num": 4,
@@ -3780,7 +3508,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/5.L0105.4"
               },
               {
                 "num": 5,
@@ -3790,82 +3519,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/5.L0105.5"
               }
             ],
             "audioSrc": "audio/5.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/5.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -3920,51 +3581,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/5.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/5.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/4.4"
+            "audioSrc": "audio/5.2"
           }
         ]
       }
@@ -4038,7 +3655,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/6.RW0105"
           },
           {
             "id": "p2",
@@ -4229,7 +3847,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/6.RW2127"
           },
           {
             "id": "p5",
@@ -4316,7 +3935,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/6.RW2835"
           },
           {
             "id": "p6",
@@ -4441,8 +4061,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/6.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/6.RW4144",
                 "nums": [
                   41,
                   42,
@@ -4451,8 +4071,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/6.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/6.RW4550",
                 "nums": [
                   45,
                   46,
@@ -4512,17 +4132,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/6.3"
+            "imgSrc": "images/6.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -4543,7 +4158,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/6.L0105.1"
               },
               {
                 "num": 2,
@@ -4553,7 +4169,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/6.L0105.2"
               },
               {
                 "num": 3,
@@ -4563,7 +4180,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/6.L0105.3"
               },
               {
                 "num": 4,
@@ -4573,7 +4191,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/6.L0105.4"
               },
               {
                 "num": 5,
@@ -4583,82 +4202,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/6.L0105.5"
               }
             ],
             "audioSrc": "audio/6.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/6.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -4713,51 +4264,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/6.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/6.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/6.5"
+            "audioSrc": "audio/6.2"
           }
         ]
       }
@@ -4831,7 +4338,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/7.RW0105"
           },
           {
             "id": "p2",
@@ -5022,7 +4530,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/7.RW2127"
           },
           {
             "id": "p5",
@@ -5109,7 +4618,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/7.RW2835"
           },
           {
             "id": "p6",
@@ -5231,8 +4741,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/7.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/7.RW4144",
                 "nums": [
                   41,
                   42,
@@ -5241,8 +4751,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/7.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/7.RW4550",
                 "nums": [
                   45,
                   46,
@@ -5304,17 +4814,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/7.3"
+            "imgSrc": "images/7.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -5335,7 +4840,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/7.L0105.1"
               },
               {
                 "num": 2,
@@ -5345,7 +4851,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/7.L0105.2"
               },
               {
                 "num": 3,
@@ -5355,7 +4862,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/7.L0105.3"
               },
               {
                 "num": 4,
@@ -5365,7 +4873,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/7.L0105.4"
               },
               {
                 "num": 5,
@@ -5375,81 +4884,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/7.L0105.5"
               }
             ],
             "audioSrc": "audio/7.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            }
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -5503,52 +4945,7 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ],
-            "audioSrc": "audio/7.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/7.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/7.4"
+            ]
           }
         ]
       }
@@ -5622,7 +5019,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/8.RW0105"
           },
           {
             "id": "p2",
@@ -5813,7 +5211,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/8.RW2127"
           },
           {
             "id": "p5",
@@ -5900,7 +5299,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/8.RW2835"
           },
           {
             "id": "p6",
@@ -6020,8 +5420,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/8.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/8.RW4144",
                 "nums": [
                   41,
                   42,
@@ -6030,8 +5430,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/8.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/8.RW4550",
                 "nums": [
                   45,
                   46,
@@ -6096,17 +5496,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/8.3"
+            "imgSrc": "images/8.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -6127,7 +5522,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/8.L0105.1"
               },
               {
                 "num": 2,
@@ -6137,7 +5533,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/8.L0105.2"
               },
               {
                 "num": 3,
@@ -6147,7 +5544,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/8.L0105.3"
               },
               {
                 "num": 4,
@@ -6157,7 +5555,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/8.L0105.4"
               },
               {
                 "num": 5,
@@ -6167,82 +5566,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/8.L0105.5"
               }
             ],
             "audioSrc": "audio/8.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/8.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -6297,51 +5628,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/8.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/8.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/8.5"
+            "audioSrc": "audio/8.2"
           }
         ]
       }
@@ -6415,7 +5702,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/9.RW0105"
           },
           {
             "id": "p2",
@@ -6606,7 +5894,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/9.RW2127"
           },
           {
             "id": "p5",
@@ -6693,7 +5982,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/9.RW2835"
           },
           {
             "id": "p6",
@@ -6824,8 +6114,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/9.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/9.RW4144",
                 "nums": [
                   41,
                   42,
@@ -6834,8 +6124,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/9.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/9.RW4550",
                 "nums": [
                   45,
                   46,
@@ -6903,17 +6193,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/9.3"
+            "imgSrc": "images/9.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -6934,7 +6219,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/9.L0105.1"
               },
               {
                 "num": 2,
@@ -6944,7 +6230,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/9.L0105.2"
               },
               {
                 "num": 3,
@@ -6954,7 +6241,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/9.L0105.3"
               },
               {
                 "num": 4,
@@ -6964,7 +6252,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/9.L0105.4"
               },
               {
                 "num": 5,
@@ -6974,82 +6263,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/9.L0105.5"
               }
             ],
             "audioSrc": "audio/9.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/8.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -7104,51 +6325,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/9.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/9.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/9.4"
+            "audioSrc": "audio/8.2"
           }
         ]
       }
@@ -7222,7 +6399,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/10.RW0105"
           },
           {
             "id": "p2",
@@ -7413,7 +6591,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/10.RW2127"
           },
           {
             "id": "p5",
@@ -7500,7 +6679,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/10.RW2835"
           },
           {
             "id": "p6",
@@ -7622,8 +6802,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/10.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/10.RW4144",
                 "nums": [
                   41,
                   42,
@@ -7632,8 +6812,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/10.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/10.RW4550",
                 "nums": [
                   45,
                   46,
@@ -7700,17 +6880,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/10.3"
+            "imgSrc": "images/10.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -7731,7 +6906,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/10.L0105.1"
               },
               {
                 "num": 2,
@@ -7741,7 +6917,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/10.L0105.2"
               },
               {
                 "num": 3,
@@ -7751,7 +6928,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/10.L0105.3"
               },
               {
                 "num": 4,
@@ -7761,7 +6939,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/10.L0105.4"
               },
               {
                 "num": 5,
@@ -7771,82 +6950,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/10.L0105.5"
               }
             ],
             "audioSrc": "audio/10.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/10.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -7901,51 +7012,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/10.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/10.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/10.5"
+            "audioSrc": "audio/10.2"
           }
         ]
       }
@@ -8019,7 +7086,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/11.RW0105"
           },
           {
             "id": "p2",
@@ -8210,7 +7278,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/11.RW2127"
           },
           {
             "id": "p5",
@@ -8297,7 +7366,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/11.RW2835"
           },
           {
             "id": "p6",
@@ -8427,8 +7497,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/11.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/11.RW4144",
                 "nums": [
                   41,
                   42,
@@ -8437,8 +7507,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/11.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/11.RW4550",
                 "nums": [
                   45,
                   46,
@@ -8504,17 +7574,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/11.3"
+            "imgSrc": "images/11.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -8535,7 +7600,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/11.L0105.1"
               },
               {
                 "num": 2,
@@ -8545,7 +7611,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/11.L0105.2"
               },
               {
                 "num": 3,
@@ -8555,7 +7622,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/11.L0105.3"
               },
               {
                 "num": 4,
@@ -8565,7 +7633,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/11.L0105.4"
               },
               {
                 "num": 5,
@@ -8575,82 +7644,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/11.L0105.5"
               }
             ],
             "audioSrc": "audio/11.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/11.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -8705,51 +7706,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/11.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/11.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/11.4"
+            "audioSrc": "audio/11.2"
           }
         ]
       }
@@ -8823,7 +7780,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/12.RW0105"
           },
           {
             "id": "p2",
@@ -9014,7 +7972,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/12.RW2127"
           },
           {
             "id": "p5",
@@ -9101,7 +8060,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/12.RW2835"
           },
           {
             "id": "p6",
@@ -9223,8 +8183,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/12.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/12.RW4144",
                 "nums": [
                   41,
                   42,
@@ -9233,8 +8193,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/12.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/12.RW4550",
                 "nums": [
                   45,
                   46,
@@ -9299,17 +8259,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/12.3"
+            "imgSrc": "images/12.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -9330,7 +8285,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/12.L0105.1"
               },
               {
                 "num": 2,
@@ -9340,7 +8296,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/12.L0105.2"
               },
               {
                 "num": 3,
@@ -9350,7 +8307,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/12.L0105.3"
               },
               {
                 "num": 4,
@@ -9360,7 +8318,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/12.L0105.4"
               },
               {
                 "num": 5,
@@ -9370,82 +8329,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/12.L0105.5"
               }
             ],
             "audioSrc": "audio/12.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/6.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -9500,51 +8391,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/12.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/12.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/12.4"
+            "audioSrc": "audio/6.2"
           }
         ]
       }
@@ -9618,7 +8465,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/13.RW0105"
           },
           {
             "id": "p2",
@@ -9809,7 +8657,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/13.RW2127"
           },
           {
             "id": "p5",
@@ -9896,7 +8745,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/13.RW2835"
           },
           {
             "id": "p6",
@@ -10017,8 +8867,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/13.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/13.RW4144",
                 "nums": [
                   41,
                   42,
@@ -10027,8 +8877,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/13.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/13.RW4550",
                 "nums": [
                   45,
                   46,
@@ -10095,17 +8945,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/13.3"
+            "imgSrc": "images/13.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -10126,7 +8971,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/13.L0105.1"
               },
               {
                 "num": 2,
@@ -10136,7 +8982,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/13.L0105.2"
               },
               {
                 "num": 3,
@@ -10146,7 +8993,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/13.L0105.3"
               },
               {
                 "num": 4,
@@ -10156,7 +9004,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/13.L0105.4"
               },
               {
                 "num": 5,
@@ -10166,82 +9015,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/13.L0105.5"
               }
             ],
             "audioSrc": "audio/10.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/1.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -10296,51 +9077,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/7.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/13.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/13.5"
+            "audioSrc": "audio/1.2"
           }
         ]
       }
@@ -10414,7 +9151,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/14.RW0105"
           },
           {
             "id": "p2",
@@ -10605,7 +9343,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/14.RW2127"
           },
           {
             "id": "p5",
@@ -10692,7 +9431,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/14.RW2835"
           },
           {
             "id": "p6",
@@ -10812,8 +9552,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/14.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/14.RW4144",
                 "nums": [
                   41,
                   42,
@@ -10822,8 +9562,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/14.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/14.RW4550",
                 "nums": [
                   45,
                   46,
@@ -10890,17 +9630,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/14.3"
+            "imgSrc": "images/14.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -10921,7 +9656,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/14.L0105.1"
               },
               {
                 "num": 2,
@@ -10931,7 +9667,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/14.L0105.2"
               },
               {
                 "num": 3,
@@ -10941,7 +9678,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/14.L0105.3"
               },
               {
                 "num": 4,
@@ -10951,7 +9689,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/14.L0105.4"
               },
               {
                 "num": 5,
@@ -10961,82 +9700,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/14.L0105.5"
               }
             ],
             "audioSrc": "audio/9.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/14.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -11091,51 +9762,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/6.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/14.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/14.4"
+            "audioSrc": "audio/14.2"
           }
         ]
       }
@@ -11209,7 +9836,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/15.RW0105"
           },
           {
             "id": "p2",
@@ -11400,7 +10028,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/15.RW2127"
           },
           {
             "id": "p5",
@@ -11487,7 +10116,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/15.RW2835"
           },
           {
             "id": "p6",
@@ -11605,8 +10235,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/15.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/15.RW4144",
                 "nums": [
                   41,
                   42,
@@ -11615,8 +10245,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/15.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/15.RW4550",
                 "nums": [
                   45,
                   46,
@@ -11681,17 +10311,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/15.3"
+            "imgSrc": "images/15.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -11712,7 +10337,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/15.L0105.1"
               },
               {
                 "num": 2,
@@ -11722,7 +10348,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/15.L0105.2"
               },
               {
                 "num": 3,
@@ -11732,7 +10359,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/15.L0105.3"
               },
               {
                 "num": 4,
@@ -11742,7 +10370,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/15.L0105.4"
               },
               {
                 "num": 5,
@@ -11752,82 +10381,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/15.L0105.5"
               }
             ],
             "audioSrc": "audio/6.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/15.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -11882,51 +10443,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/5.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/15.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/15.5"
+            "audioSrc": "audio/15.2"
           }
         ]
       }
@@ -12000,7 +10517,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/16.RW0105"
           },
           {
             "id": "p2",
@@ -12191,7 +10709,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/16.RW2127"
           },
           {
             "id": "p5",
@@ -12278,7 +10797,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/16.RW2835"
           },
           {
             "id": "p6",
@@ -12399,8 +10919,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/16.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/16.RW4144",
                 "nums": [
                   41,
                   42,
@@ -12409,8 +10929,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/16.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/16.RW4550",
                 "nums": [
                   45,
                   46,
@@ -12476,17 +10996,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/16.3"
+            "imgSrc": "images/16.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -12507,7 +11022,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/16.L0105.1"
               },
               {
                 "num": 2,
@@ -12517,7 +11033,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/16.L0105.2"
               },
               {
                 "num": 3,
@@ -12527,7 +11044,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/16.L0105.3"
               },
               {
                 "num": 4,
@@ -12537,7 +11055,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/16.L0105.4"
               },
               {
                 "num": 5,
@@ -12547,82 +11066,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/16.L0105.5"
               }
             ],
             "audioSrc": "audio/5.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/2.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -12677,51 +11128,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/4.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/16.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/16.5"
+            "audioSrc": "audio/2.2"
           }
         ]
       }
@@ -12795,7 +11202,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/17.RW0105"
           },
           {
             "id": "p2",
@@ -12986,7 +11394,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/17.RW2127"
           },
           {
             "id": "p5",
@@ -13073,7 +11482,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/17.RW2835"
           },
           {
             "id": "p6",
@@ -13200,8 +11610,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/17.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/17.RW4144",
                 "nums": [
                   41,
                   42,
@@ -13210,8 +11620,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/17.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/17.RW4550",
                 "nums": [
                   45,
                   46,
@@ -13276,17 +11686,12 @@ const QUESTIONS = {
                 "alts": []
               }
             ],
-            "imgSrc": "images/17.3"
+            "imgSrc": "images/17.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -13307,7 +11712,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/17.L0105.1"
               },
               {
                 "num": 2,
@@ -13317,7 +11723,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/17.L0105.2"
               },
               {
                 "num": 3,
@@ -13327,7 +11734,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/17.L0105.3"
               },
               {
                 "num": 4,
@@ -13337,7 +11745,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/17.L0105.4"
               },
               {
                 "num": 5,
@@ -13347,82 +11756,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/17.L0105.5"
               }
             ],
             "audioSrc": "audio/11.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/5.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -13477,51 +11818,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/3.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/17.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/17.4"
+            "audioSrc": "audio/5.2"
           }
         ]
       }
@@ -13595,7 +11892,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/18.RW0105"
           },
           {
             "id": "p2",
@@ -13786,7 +12084,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/18.RW2127"
           },
           {
             "id": "p5",
@@ -13873,7 +12172,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/18.RW2835"
           },
           {
             "id": "p6",
@@ -13998,8 +12298,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/18.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/18.RW4144",
                 "nums": [
                   41,
                   42,
@@ -14008,8 +12308,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/18.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/18.RW4550",
                 "nums": [
                   45,
                   46,
@@ -14072,17 +12372,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/18.3"
+            "imgSrc": "images/18.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -14103,7 +12398,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/18.L0105.1"
               },
               {
                 "num": 2,
@@ -14113,7 +12409,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/18.L0105.2"
               },
               {
                 "num": 3,
@@ -14123,7 +12420,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/18.L0105.3"
               },
               {
                 "num": 4,
@@ -14133,7 +12431,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/18.L0105.4"
               },
               {
                 "num": 5,
@@ -14143,82 +12442,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/18.L0105.5"
               }
             ],
             "audioSrc": "audio/8.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/4.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -14273,50 +12504,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/2.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/18.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ]
+            "audioSrc": "audio/4.2"
           }
         ]
       }
@@ -14390,7 +12578,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/19.RW0105"
           },
           {
             "id": "p2",
@@ -14581,7 +12770,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/19.RW2127"
           },
           {
             "id": "p5",
@@ -14668,7 +12858,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/19.RW2835"
           },
           {
             "id": "p6",
@@ -14792,8 +12983,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/19.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/19.RW4144",
                 "nums": [
                   41,
                   42,
@@ -14802,8 +12993,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/19.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/19.RW4550",
                 "nums": [
                   45,
                   46,
@@ -14870,17 +13061,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/19.3"
+            "imgSrc": "images/19.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -14901,7 +13087,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/19.L0105.1"
               },
               {
                 "num": 2,
@@ -14911,7 +13098,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/19.L0105.2"
               },
               {
                 "num": 3,
@@ -14921,7 +13109,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/19.L0105.3"
               },
               {
                 "num": 4,
@@ -14931,7 +13120,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/19.L0105.4"
               },
               {
                 "num": 5,
@@ -14941,82 +13131,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/19.L0105.5"
               }
             ],
             "audioSrc": "audio/7.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/3.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -15071,51 +13193,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/9.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/19.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/19.5"
+            "audioSrc": "audio/3.2"
           }
         ]
       }
@@ -15189,7 +13267,8 @@ const QUESTIONS = {
                 "text": "H"
               }
             ],
-            "answers": {}
+            "answers": {},
+            "imgSrc": "images/20.RW0105"
           },
           {
             "id": "p2",
@@ -15380,7 +13459,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/20.RW2127"
           },
           {
             "id": "p5",
@@ -15467,7 +13547,8 @@ const QUESTIONS = {
                 ],
                 "ans": ""
               }
-            ]
+            ],
+            "imgSrc": "images/20.RW2835"
           },
           {
             "id": "p6",
@@ -15589,8 +13670,8 @@ const QUESTIONS = {
             ],
             "groups": [
               {
-                "label": "Questions 41–44",
-                "imgSrc": "images/20.1",
+                "label": "Questions 41-44",
+                "imgSrc": "images/20.RW4144",
                 "nums": [
                   41,
                   42,
@@ -15599,8 +13680,8 @@ const QUESTIONS = {
                 ]
               },
               {
-                "label": "Questions 45–50",
-                "imgSrc": "images/20.2",
+                "label": "Questions 45-50",
+                "imgSrc": "images/20.RW4550",
                 "nums": [
                   45,
                   46,
@@ -15670,17 +13751,12 @@ const QUESTIONS = {
                 ]
               }
             ],
-            "imgSrc": "images/20.3"
+            "imgSrc": "images/20.RW5155"
           },
           {
             "id": "p8",
             "type": "writing",
-            "questions": [
-              {
-                "num": 56,
-                "instruction": "Question 56: Write a note/letter as instructed in the exam (25-35 words). Xem đề bên trái."
-              }
-            ]
+            "questions": []
           }
         ]
       },
@@ -15701,7 +13777,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/20.L0105.1"
               },
               {
                 "num": 2,
@@ -15711,7 +13788,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/20.L0105.2"
               },
               {
                 "num": 3,
@@ -15721,7 +13799,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/20.L0105.3"
               },
               {
                 "num": 4,
@@ -15731,7 +13810,8 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/20.L0105.4"
               },
               {
                 "num": 5,
@@ -15741,82 +13821,14 @@ const QUESTIONS = {
                   "B",
                   "C"
                 ],
-                "ans": ""
+                "ans": "",
+                "qImgSrc": "images/20.L0105.5"
               }
             ],
             "audioSrc": "audio/20.1"
           },
           {
             "id": "ls2",
-            "type": "matching",
-            "instruction": "Questions 6-10: Match the people with what they say.",
-            "questions": [
-              {
-                "num": 6,
-                "text": "(Xem câu 6)"
-              },
-              {
-                "num": 7,
-                "text": "(Xem câu 7)"
-              },
-              {
-                "num": 8,
-                "text": "(Xem câu 8)"
-              },
-              {
-                "num": 9,
-                "text": "(Xem câu 9)"
-              },
-              {
-                "num": 10,
-                "text": "(Xem câu 10)"
-              }
-            ],
-            "options": [
-              {
-                "id": "A",
-                "text": "A"
-              },
-              {
-                "id": "B",
-                "text": "B"
-              },
-              {
-                "id": "C",
-                "text": "C"
-              },
-              {
-                "id": "D",
-                "text": "D"
-              },
-              {
-                "id": "E",
-                "text": "E"
-              },
-              {
-                "id": "F",
-                "text": "F"
-              },
-              {
-                "id": "G",
-                "text": "G"
-              },
-              {
-                "id": "H",
-                "text": "H"
-              }
-            ],
-            "answers": {
-              "6": "",
-              "7": "",
-              "8": "",
-              "9": "",
-              "10": ""
-            },
-            "audioSrc": "audio/20.2"
-          },
-          {
-            "id": "ls3",
             "type": "mcq",
             "instruction": "Listening Questions 11-15: Choose A, B or C.",
             "questions": [
@@ -15871,51 +13883,7 @@ const QUESTIONS = {
                 "ans": ""
               }
             ],
-            "audioSrc": "audio/8.3"
-          },
-          {
-            "id": "ls4",
-            "type": "form_fill",
-            "instruction": "Questions 16-20: Complete the form.",
-            "imgSrc": "images/20.4",
-            "questions": [
-              {
-                "num": 16,
-                "label": "(Xem câu 16)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 17,
-                "label": "(Xem câu 17)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 18,
-                "label": "(Xem câu 18)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 19,
-                "label": "(Xem câu 19)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              },
-              {
-                "num": 20,
-                "label": "(Xem câu 20)",
-                "prefix": "",
-                "suffix": "",
-                "ans": ""
-              }
-            ],
-            "audioSrc": "audio/20.4"
+            "audioSrc": "audio/20.2"
           }
         ]
       }
