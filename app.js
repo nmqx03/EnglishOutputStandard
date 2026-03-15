@@ -501,30 +501,31 @@ function renderMatching(secId, part) {
 
       const table = CE('div', { className: 'ls2-table' });
 
-      // Left column: questions
+      // Left column: questions + per-question button rows (ABCD / EFGH)
       const leftCol = CE('div', { className: 'ls2-col ls2-col--left' });
       leftCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col1Title }));
       questions.forEach(item => {
         const k = key(secId, part.id, item.num);
+        const cell = CE('div', { className: 'ls2-cell ls2-cell--with-btns' });
+        // Question text row
         const row = CE('div', { className: 'ls2-row' });
         row.innerHTML = `<span class="ls2-q-num">${item.num}.</span><span class="ls2-q-text">${esc(item.text || '')}</span>`;
-        // answer button row below each question
-        const btnRow = CE('div', { className: 'ls2-btn-row' });
+        cell.appendChild(row);
+        // Button grid: 4 per row
+        const btnGrid = CE('div', { className: 'ls2-btn-grid' });
         opts.forEach(o => {
           const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
           btn.dataset.sec = secId; btn.dataset.part = part.id;
           btn.dataset.num = item.num; btn.dataset.val = o.id;
           btn.addEventListener('click', onMatchBtnClick);
-          btnRow.appendChild(btn);
+          btnGrid.appendChild(btn);
         });
-        const cell = CE('div', { className: 'ls2-cell' });
-        cell.appendChild(row);
-        cell.appendChild(btnRow);
-        cell.appendChild(CE('div', { className: 'q-fb', id: `fb_${key(secId, part.id, item.num)}` }));
+        cell.appendChild(btnGrid);
+        cell.appendChild(CE('div', { className: 'q-fb', id: `fb_${k}` }));
         leftCol.appendChild(cell);
       });
 
-      // Right column: options list
+      // Right column: options A–H list
       const rightCol = CE('div', { className: 'ls2-col ls2-col--right' });
       rightCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col2Title }));
       opts.forEach(o => {
