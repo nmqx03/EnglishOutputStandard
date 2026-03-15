@@ -745,7 +745,7 @@ body {
   border: 1.5px solid var(--blue-rim);
   border-radius: 12px;
 }
-.match-opt-list--letters { gap: 6px; padding: 8px 12px; }
+.match-opt-list--letters { display: none !important; }
 
 .match-opt-item {
   display: flex; align-items: center; gap: 7px;
@@ -769,15 +769,9 @@ body {
   min-width: 24px; flex-shrink: 0;
 }
 .match-btn-row {
-  display: grid;
-  grid-template-columns: repeat(8, 34px);
+  display: flex;
   gap: 5px;
-}
-
-@media (max-width: 520px) {
-  .match-btn-row {
-    grid-template-columns: repeat(4, 34px);
-  }
+  flex-wrap: nowrap;
 }
 
 .match-lbtn {
