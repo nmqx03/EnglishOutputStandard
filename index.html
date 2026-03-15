@@ -3,10 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ôn Thi Tiếng Anh Đầu Ra – HUMG</title>
+  <title>Ôn Thi Tiếng Anh – HUMG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Cg transform='translate(8,10)'%3E%3Cpolygon points='24,8 48,20 24,32 0,20' fill='white'/%3E%3Cpolygon points='24,26 40,18 40,34 24,42 8,34 8,18' fill='%23bfdbfe'/%3E%3Ccircle cx='48' cy='20' r='2.5' fill='white'/%3E%3Crect x='46.5' y='20' width='2' height='12' fill='white' rx='1'/%3E%3Cellipse cx='47.5' cy='33' rx='3.5' ry='2' fill='%23fbbf24'/%3E%3C/g%3E%3C/svg%3E">
+  <!-- PWA / mobile icon -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFNklEQVR4nO3cy20UQRhF4Z4RGRhngFmQATsCYWeLGBwCMVh4RyDsyIAFJgNMBkiwQGVmyj099fjrdet8OwQ2zczhurplebd04ur655/W14A8D/eXu9bX0OwCCFhfi8Cr/oVEPK9acRf/S4gYvpJxF/vEhIxzSoRt/gkJGbEsw95bfaJlIWaksezG5H8GIcNK7lpnLzQxw1JuT1lBEzNKyOkqad4JGbXEHkGiF5qYUVNsb1FBEzNaiOkuOGhiRkuh/Zk+hwZaCwqadUYPQjo8GzQxoyfnetwMmpjRo60uOUNDysmgWWf07FSfq0ETM0aw1ilHDkh5FjTrjJH4vbLQkHIUNOuMER12y0JDCkFDylPQHDcwMtcvCw0pBA0pu2XhuAEdLDSkEDSkEDSk7Dk/QwkLDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEXcn3Ty9bX8IUdny3XVlrIb++eWxwJXMg6EJCFpmw7RG0sZSjBWHbIWgjFmdkws5H0JlK3OwRdjqecmQo9eSCJyLpWOgENYNjreMQdISWy0nYYQg6QE9HAMLeRtAbegrZR9jrCHpFzyH7CPsYQR8YKWQfYf9D0MvYIftmD3vqoJVC9s0a9pRBK4fsmy3sqYKeKWTfLGFPEfTMIfvUw5b/Xg5iPqb+esgutPobZ0FxreWCJuR4SmHLBE3I+RTCHj5oQrY3ctjDBk3I5Y0Y9nBBE3J7PYc+3GO71zePXb+gaGu4oB3CLmfk1/VF6wvI5V58jiL5Rg7ZGXahff5if/kx1K1BdYevj9JXu+EX2ufemLvbi6c37d2rXctL6oofshq5oNcQ9jxfsWSOHCFmeVN9M/27p1joQzOt9UwhO9MF7SiHPWPIzrRBO0phzxyyM33QzshhE/J/U90UhhgtjtGutzQWesUIa03I6wh6Q49hE/I2gg7QQ9iEHIagI7QIm5DjcFOYoFZkxByPhU5Ucq0JOR1BZ7IMm5DzEbSRnLAJ2Q5BG4sJm5DtcVNYyLlYibkMFrqgtbUm5LIIuoIRI/795Wrjd79Wu45YBI0j396/Df4zbz73FzZBY1mWsJBPfUxPYQ/3o8Bi3d1etL6E7nz4+Ovo1ykx+3qJWn6h3ZtH2M9DViS/0L4Zw94K2WKdnR5WWn6hfTMt9gyL7JsuaEc57BlDdqY7cpyiEHZqyNwUChp5sWdeZB8LfcIIYVuGnLPSvazzshD0WT2GXXKRY8LuKWSHoAP1EHbNo8VW2D2G7BB0pBZhc0YOR9CJaoRNyPEIOlOJsAk5HUEbsQibkPMRtLGUsAnZDkEXEhI2Idsj6MLWwibkcgi6krvbC0KugKAhhZ/LASkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSn7h/vLXeuLAKyw0JBC0JBC0JCyX5Zl4RwNBQ/3lzsWGlIIGlKegubYgZG5flloSCFoSDkKmmMHRnTYLQsNKc+CZqUxEr9XFhpSVoNmpTGCtU5PLjRRo2en+uTIASmbQbPS6NFWl2cXmqjRk3M9Bh05iBo9COmQMzSkBAfNSqOl0P6iFpqo0UJMd9FHDqJGTbG9ZcV5df3zT87HA6ekDmfWTSFrjRJyusp+ykHUsJTbk2mMHEGQymoYTZ9Ds9ZIYdlNsQBZa5xTYgCLLyphw1fyK3nVIwJxz6vWcbTZmZe49bW4p/oLf4k4kJmmINYAAAAASUVORK5CYII=">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="English Test">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAoklEQVR4nGNkgALV5Nf/GUgEt+eKMjKSqxkGmCjRzMDAwMBEiWaiDLg1RwSvPCO6FwhpYGBgYFBLeYMw4P///5SFgVrKGwa1lDcMB+6QZs6BO/8Z1FLeMLCgCzIwMDA4qDDi1YgMWPApQjYIlwuxGkBIEwxci7GkLB1oLTmOGY0MDAwMsyqEcWpK63iLwsdqALph6JpIMoAQYLo9VxR3nBEBAIR/PUmwjjnUAAAAAElFTkSuQmCC">
+  <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABCUlEQVR4nOWXwQ2CMBSG/0fcQNlAOLiBNwfxJnEGR3AGIzcH4eYGHoQNxA1M6glTQ6F9baES/xMtJd/X15KmBEWS3UOo+n2kzGOS21+NIcFdIlEIuMyjEHA5kX7IwAIhZw/8QgUmL3A/L5y+J+4eMAGmWe1PwHWGOqGWgA8gR4iEEGF/wzSrWWvmXaB5aESKatiCFJWAPOlZ1yAA2CxJ9doarIpSwKeIrqK9Ai4ipktpJMAR4eyhV5HwBPpEuJv3tl0DYFagS8Ql0z8NbbO6XAH0HEanw9w7dH98tvqMjmMXGRWULWAjogNbCehkTKFeBGQRG/BHAPj3iwnQvrGOlTKPKZIbY8MB4A0u5X1FmZ/GnQAAAABJRU5ErkJggg==">
+  <link rel="icon" type="image/png" sizes="48x48" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABmUlEQVR4nO2azVEDIRiGXxg7iOnA5GAH3izEmxlrSAnWkDE3C9mbHXgw6cCkA2fwRPwGCD/LBwvOPqcsJOz7sCxkSQQ8rJ6/la++Jof9UrjKnYUtBTcxRaT5hpbDA3Y+6atsFZpTugp7QOcV9KBHrHugN2TPvQ/8hyswdYBcZoGpmQVCfL3dFm1fcE+jMYHXmxPb+bIFOHo4RyhZoPSQANKEggI1AofwCVkCLQQOQYWEUqrv70LrzYl1VqjNZR3oSYRmtRYyXTkc2xpZw1E5O/km9CEAeLxzbl5UIdSRXgGzkZoisSMgSsBstKRI6tBNEjBPwiky9p4bJWCeNEckd7LIEjBDpIhwzXIsApoYEc7p+WdY8QpoXCLc68rn0wMA5itgUmox1OGB+Zl4Gu7fPy6vuxQA/iSiHil320XxQNd4eT1765OeiWuKhIJrRu9KlJCJDU3J3lbhEBkTXMO6sZUikxOawr4zB/hFuIJrighQdtsFe2jK/CPf1Ejg+v8QWuewXwpJD6YMk4rOK12FrUNzWvdA6xJmvl9KFLzY8pUPMgAAAABJRU5ErkJggg==">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,10 +25,10 @@
     <header class="home-header">
       <div class="home-badge">
         <span class="badge-dot"></span>
-        Bộ đề tiếng Anh · Cambridge
+        HUMG · Bộ đề tiếng Anh
       </div>
       <h1>Ôn Chuẩn Đầu Ra<br><em>Ngoại Ngữ</em></h1>
-      <p class="subtitle"></p>
+      <p class="subtitle">20 đề luyện tập</p>
     </header>
     <div class="exam-grid" id="exam-grid"></div>
     <footer class="home-footer">
@@ -36,19 +45,20 @@
     <div class="exam-popup">
 
       <nav class="exam-nav">
-        <button id="btn-back" class="btn-back">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Đề thi
-        </button>
-        <div class="nav-center">
-          <span id="nav-title">Đề 1</span>
-        </div>
-        <div class="nav-right">
-          <!-- Timer badge -->
+        <div class="nav-left">
+          <button id="btn-back" class="btn-back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Đề thi
+          </button>
           <div class="timer-badge" id="timer-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
             <span id="timer-text">60:00</span>
           </div>
+        </div>
+        <div class="nav-center">
+          <span id="nav-title">Đề 1</span>
+        </div>
+        <div class="nav-right">
           <span class="answer-status" id="answer-status">0/55</span>
           <div class="score-badge hidden" id="score-badge"><span id="score-text">0/0</span></div>
           <button class="btn-submit" id="btn-submit">Nộp bài</button>
