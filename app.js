@@ -133,6 +133,7 @@ function openExam(num) {
 
   renderAnswerSheet();
   answerContent.scrollTop = 0;
+  updateUI();
   if (S.submitted) {
     markAnswers();
     stopTimer();
