@@ -18,10 +18,16 @@
         HUMG · Bộ đề tiếng Anh
       </div>
       <h1>Ôn Chuẩn Đầu Ra<br><em>Ngoại Ngữ</em></h1>
-      <p class="subtitle">20 đề luyện tập · Tự chấm điểm tức thì</p>
+      <p class="subtitle">20 đề luyện tập</p>
     </header>
     <div class="exam-grid" id="exam-grid"></div>
-    <footer class="home-footer">Fb: Chu Hiền Anh · 0337082255</footer>
+    <footer class="home-footer">
+      <span>NMQ</span>
+      <button class="btn-clear-history" id="btn-clear-history" title="Xoá lịch sử làm bài">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Xoá lịch sử
+      </button>
+    </footer>
   </div>
 
   <!-- EXAM POPUP (overlay) -->
@@ -37,6 +43,11 @@
           <span id="nav-title">Đề 1</span>
         </div>
         <div class="nav-right">
+          <!-- Timer badge -->
+          <div class="timer-badge" id="timer-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            <span id="timer-text">60:00</span>
+          </div>
           <span class="answer-status" id="answer-status">0/55</span>
           <div class="score-badge hidden" id="score-badge"><span id="score-text">0/0</span></div>
           <button class="btn-submit" id="btn-submit">Nộp bài</button>
@@ -86,6 +97,39 @@
       <div class="modal-btns">
         <button class="modal-btn secondary" id="modal-cancel">Làm tiếp</button>
         <button class="modal-btn primary" id="modal-confirm">Nộp bài</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start exam modal -->
+  <div class="modal-overlay hidden" id="modal-start">
+    <div class="modal">
+      <div class="modal-icon" id="modal-start-icon">📝</div>
+      <h3 id="modal-start-title">Đề 1</h3>
+      <p id="modal-start-desc">Thời gian: 60 phút</p>
+      <div class="modal-btns" id="modal-start-btns">
+        <button class="modal-btn secondary" id="modal-start-cancel">Huỷ</button>
+        <button class="modal-btn warning hidden" id="modal-start-reset">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Làm lại
+        </button>
+        <button class="modal-btn primary" id="modal-start-confirm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Bắt đầu làm bài
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear history modal -->
+  <div class="modal-overlay hidden" id="modal-clear">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <h3>Xoá lịch sử?</h3>
+      <p>Toàn bộ kết quả và tiến trình làm bài sẽ bị xoá.</p>
+      <div class="modal-btns">
+        <button class="modal-btn secondary" id="modal-clear-cancel">Huỷ</button>
+        <button class="modal-btn primary" id="modal-clear-confirm">Xoá tất cả</button>
       </div>
     </div>
   </div>

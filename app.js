@@ -8,7 +8,9 @@
 const S = {
   exam: null,
   answers: {}, submitted: false,
+  timerInterval: null, timerSeconds: 0,
 };
+const EXAM_DURATION = 60 * 60; // 60 minutes
 const LS_KEY = (n) => `humg_v2_exam_${n}`;
 
 // ── DOM ──────────────────────────────────────────────────────
@@ -24,13 +26,16 @@ const answerStatus  = $('answer-status');
 const resultPanel   = $('result-panel');
 const scoreBadge    = $('score-badge');
 const scoreText     = $('score-text');
+const timerBadge    = $('timer-badge');
+const timerText     = $('timer-text');
 
 // ── SAVE / LOAD ───────────────────────────────────────────────
 function save(scoreData) {
   try {
     localStorage.setItem(LS_KEY(S.exam), JSON.stringify({
       answers: S.answers, submitted: S.submitted,
-      score: scoreData || null, ts: Date.now()
+      score: scoreData || null, ts: Date.now(),
+      timerSeconds: S.timerSeconds
     }));
   } catch(e) {}
 }
@@ -43,42 +48,98 @@ function buildHome() {
   examGrid.innerHTML = '';
   for (let i = 1; i <= 20; i++) {
     const saved = loadSaved(i);
-    const done  = saved?.submitted;
+    const done     = saved?.submitted;
+    const inProgress = !done && saved && Object.keys(saved.answers || {}).length > 0;
     const score = saved?.score;
-    const card  = CE('div', { className: 'exam-card' + (done ? ' done' : '') });
+    const card  = CE('div', { className: 'exam-card' + (done ? ' done' : inProgress ? ' in-progress' : '') });
+
     const scoreHtml = done && score
       ? `<div class="card-score ${score.pct >= 70 ? 'score-hi' : score.pct >= 40 ? 'score-mid' : 'score-lo'}">
            <span class="score-num">${score.correct}/${score.total}</span>
            <span class="score-pct">${score.pct}%</span>
          </div>`
       : '';
+
+    let timeHtml = '';
+    if (done && typeof saved.timerSeconds === 'number') {
+      const elapsed = EXAM_DURATION - saved.timerSeconds;
+      const safeSecs = Math.max(0, elapsed);
+      const m = Math.floor(safeSecs / 60);
+      const s = safeSecs % 60;
+      timeHtml = `<div class="card-time">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}
+      </div>`;
+    }
+
+    const inProgressHtml = inProgress
+      ? `<div class="card-in-progress">
+           <span class="card-in-progress-dot"></span>Đang làm
+         </div>`
+      : '';
+
     card.innerHTML = `
-      <div class="card-num">Đề</div>
-      <div class="card-title">${i}</div>
-      ${scoreHtml}
+      <div class="card-top">
+        <div class="card-num">Đề</div>
+        <div class="card-title">${i}</div>
+      </div>
+      <div class="card-bottom">
+        ${scoreHtml}
+        ${inProgressHtml}
+        ${timeHtml}
+      </div>
       <div class="card-arrow">→</div>`;
-    card.addEventListener('click', () => openExam(i));
+    card.addEventListener('click', () => showStartModal(i));
     examGrid.appendChild(card);
   }
 }
 
 // ── OPEN EXAM ────────────────────────────────────────────────
+function showStartModal(num) {
+  const saved = loadSaved(num);
+  const hasSaved = saved && (Object.keys(saved.answers || {}).length > 0 || saved.submitted);
+  $('modal-start-title').textContent = `Đề ${num}`;
+  $('modal-start-icon').textContent = hasSaved ? '📂' : '📝';
+  $('modal-start-desc').textContent = hasSaved
+    ? (saved.submitted ? `Đã nộp bài · ${saved.score ? saved.score.correct + '/' + saved.score.total + ' câu đúng' : ''}` : 'Đang làm dở · Tiếp tục bài thi')
+    : 'Thời gian: 60 phút';
+  $('modal-start-confirm').textContent = '';
+  $('modal-start-confirm').innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> ' + (hasSaved ? 'Tiếp tục bài thi' : 'Bắt đầu làm bài');
+  // Show/hide "Làm lại" button
+  const resetBtn = $('modal-start-reset');
+  if (hasSaved) resetBtn.classList.remove('hidden');
+  else resetBtn.classList.add('hidden');
+  $('modal-start').dataset.examNum = num;
+  $('modal-start').classList.remove('hidden');
+}
+
 function openExam(num) {
   S.exam = num;
   S.answers = {}; S.submitted = false;
 
   const saved = loadSaved(num);
-  if (saved) { S.answers = saved.answers || {}; S.submitted = saved.submitted || false; }
+  if (saved) {
+    S.answers = saved.answers || {};
+    S.submitted = saved.submitted || false;
+    S.timerSeconds = (typeof saved.timerSeconds === 'number') ? saved.timerSeconds : EXAM_DURATION;
+  } else {
+    S.timerSeconds = EXAM_DURATION;
+  }
 
   navTitle.textContent = `Đề ${num}`;
   document.title = `Đề ${num} – Ôn Thi Tiếng Anh HUMG`;
 
-  // Show as popup over home screen
   examScreen.classList.remove('hidden');
 
   renderAnswerSheet();
-  updateUI();
-  if (S.submitted) markAnswers();
+  answerContent.scrollTop = 0;
+  if (S.submitted) {
+    markAnswers();
+    stopTimer();
+    renderTimer(S.timerSeconds);
+  } else {
+    startTimer();
+  }
 }
 
 // ── IMAGE LIGHTBOX ───────────────────────────────────────────
@@ -381,7 +442,8 @@ function renderMCQ(secId, part) {
     }
     row.appendChild(stem);
 
-    const ch = CE('div', { className: 'choices' });
+    const isVertical = (part.id === 'p3');
+    const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
     const labels = ['A','B','C'];
     (q.opts || []).forEach((opt, idx) => {
       const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}  ${opt}` });
@@ -401,16 +463,115 @@ function onMCQClick(e) {
   if (S.submitted) return;
   const { sec, part, num, val } = e.currentTarget.dataset;
   const k = key(sec, part, num);
-  S.answers[k] = val;
-  answerContent.querySelectorAll(`.cbtn[data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
-    .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  // Toggle: click same answer again → deselect
+  if (S.answers[k] === val) {
+    delete S.answers[k];
+    answerContent.querySelectorAll(`.cbtn[data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.remove('selected'));
+  } else {
+    S.answers[k] = val;
+    answerContent.querySelectorAll(`.cbtn[data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
   updateAnswerStatus();
   save();
 }
 
 // ── MATCHING ──────────────────────────────────────────────────
+// p1 (RW Q1-5): image-based → show only letter buttons A-H, no text
+// ls2 (Listening Q6-10): show text options as letter buttons
+// others: keep original select dropdown
 function renderMatching(secId, part) {
   const wrap = CE('div');
+  const isP1   = (part.id === 'p1');   // RW Q1-5: ảnh đã có, chỉ cần chọn chữ
+  const isLs2  = (part.id === 'ls2');  // Listening Q6-10: hiện text + chọn chữ
+
+  if (isP1 || isLs2) {
+    const opts = part.options || [];
+    const questions = part.questions || [];
+
+    if (isLs2) {
+      // ── 2-column table: left=questions(people/times), right=options(clothes/activities) ──
+      // Extract column titles from instruction: "Match X with their Y."
+      const inst = part.instruction || '';
+      const mTitle = inst.match(/Match (.+?) with (?:their )?(.+?)\.?$/i);
+      const col1Title = mTitle ? mTitle[1].trim() : 'Câu hỏi';
+      const col2Title = mTitle ? mTitle[2].trim() : 'Đáp án';
+
+      const table = CE('div', { className: 'ls2-table' });
+
+      // Left column: questions
+      const leftCol = CE('div', { className: 'ls2-col ls2-col--left' });
+      leftCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col1Title }));
+      questions.forEach(item => {
+        const k = key(secId, part.id, item.num);
+        const row = CE('div', { className: 'ls2-row' });
+        row.innerHTML = `<span class="ls2-q-num">${item.num}.</span><span class="ls2-q-text">${esc(item.text || '')}</span>`;
+        // answer button row below each question
+        const btnRow = CE('div', { className: 'ls2-btn-row' });
+        opts.forEach(o => {
+          const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
+          btn.dataset.sec = secId; btn.dataset.part = part.id;
+          btn.dataset.num = item.num; btn.dataset.val = o.id;
+          btn.addEventListener('click', onMatchBtnClick);
+          btnRow.appendChild(btn);
+        });
+        const cell = CE('div', { className: 'ls2-cell' });
+        cell.appendChild(row);
+        cell.appendChild(btnRow);
+        cell.appendChild(CE('div', { className: 'q-fb', id: `fb_${key(secId, part.id, item.num)}` }));
+        leftCol.appendChild(cell);
+      });
+
+      // Right column: options list
+      const rightCol = CE('div', { className: 'ls2-col ls2-col--right' });
+      rightCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col2Title }));
+      opts.forEach(o => {
+        const item = CE('div', { className: 'ls2-opt-item' });
+        item.innerHTML = `<span class="match-opt-letter">${o.id}</span><span class="ls2-opt-text">${esc(o.text)}</span>`;
+        rightCol.appendChild(item);
+      });
+
+      table.appendChild(leftCol);
+      table.appendChild(rightCol);
+      wrap.appendChild(table);
+      return wrap;
+    }
+
+    // p1: show letter options list + per-question letter buttons
+    if (isP1 && opts.length) {
+      const optList = CE('div', { className: 'match-opt-list match-opt-list--letters' });
+      opts.forEach(o => {
+        const item = CE('div', { className: 'match-opt-item' });
+        item.innerHTML = `<span class="match-opt-letter">${o.id}</span>`;
+        optList.appendChild(item);
+      });
+      wrap.appendChild(optList);
+    }
+
+    // Questions row: number + letter buttons
+    questions.forEach(item => {
+      const k = key(secId, part.id, item.num);
+      const div = CE('div', { className: 'match-q match-q--btn' });
+      const numSpan = CE('span', { className: 'match-q-num', textContent: `${item.num}.` });
+      div.appendChild(numSpan);
+      const btnRow = CE('div', { className: 'match-btn-row' });
+      opts.forEach(o => {
+        const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
+        btn.dataset.sec = secId; btn.dataset.part = part.id;
+        btn.dataset.num = item.num; btn.dataset.val = o.id;
+        btn.addEventListener('click', onMatchBtnClick);
+        btnRow.appendChild(btn);
+      });
+      div.appendChild(btnRow);
+      div.appendChild(CE('div', { className: 'q-fb', id: `fb_${k}` }));
+      wrap.appendChild(div);
+    });
+
+    return wrap;
+  }
+
+  // Default: select dropdown
   const optsHtml = ['<option value="">-- Chọn --</option>',
     ...(part.options || []).map(o => `<option value="${o.id}">${o.id} – ${esc(o.text)}</option>`)
   ].join('');
@@ -433,6 +594,24 @@ function renderMatching(secId, part) {
   return wrap;
 }
 
+function onMatchBtnClick(e) {
+  if (S.submitted) return;
+  const { sec, part, num, val } = e.currentTarget.dataset;
+  const k = key(sec, part, num);
+  // Toggle deselect
+  if (S.answers[k] === val) {
+    delete S.answers[k];
+    answerContent.querySelectorAll(`.match-lbtn[data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.remove('selected'));
+  } else {
+    S.answers[k] = val;
+    answerContent.querySelectorAll(`.match-lbtn[data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
+  updateAnswerStatus();
+  save();
+}
+
 function onMatchChange(e) {
   if (S.submitted) return;
   const { sec, part, num } = e.target.dataset;
@@ -450,8 +629,13 @@ function renderWordFill(secId, part) {
   if (part.groups && part.groups.length) {
     part.groups.forEach(grp => {
       const grpWrap = CE('div', { className: 'fill-group' });
-      if (grp.label) {
-        grpWrap.appendChild(CE('div', { className: 'fill-group-label', textContent: grp.label }));
+      // Build label from actual question numbers in this group
+      const grpNums2 = grp.nums || [];
+      const grpLabel = grpNums2.length
+        ? `Questions ${grpNums2[0]}–${grpNums2[grpNums2.length - 1]}`
+        : grp.label;
+      if (grpLabel) {
+        grpWrap.appendChild(CE('div', { className: 'fill-group-label', textContent: grpLabel }));
       }
 
       // Group-level image → unified clickable part image
@@ -475,7 +659,7 @@ function renderWordFill(secId, part) {
 function loadImgWithFallback(img, wrap, baseSrc) {
   const hasExt = /\.(jpg|jpeg|png|gif|webp)$/i.test(baseSrc);
   if (hasExt) { img.src = baseSrc; return; }
-  const exts = ['.jpg', '.png', '.jpeg'];
+  const exts = ['.png', '.jpg', '.jpeg'];
   let idx = 0;
   img.src = baseSrc + exts[idx];
   img.onerror = () => {
@@ -494,7 +678,7 @@ function buildFillRow(secId, part, q) {
   const k = key(secId, part.id, q.num);
   const row = CE('div', { className: 'fill-row', id: `qrow_${k}` });
 
-  const hasStem = q.stem && !q.stem.match(/^\(Xem/);
+  const hasStem = q.stem && !q.stem.match(/^\(Xem/) && !(q.num >= 41 && q.num <= 50);
   if (hasStem) {
     const stem = CE('div', { className: 'q-stem' });
     stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}${q.hint ? `<span class="fill-hint"> (${esc(q.hint)})</span>` : ''}`;
@@ -502,6 +686,8 @@ function buildFillRow(secId, part, q) {
   }
 
   const inpRow = CE('div', { className: 'fill-inp-row' });
+  // Always show question number before input
+  inpRow.appendChild(CE('span', { className: 'fill-num-badge', textContent: `${q.num}.` }));
   const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: 'Nhập từ...', id: `inp_${k}`, autocomplete: 'off' });
   inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
   inp.addEventListener('input', onFillInput);
@@ -531,8 +717,11 @@ function renderFormFill(secId, part) {
   const examNum = S.exam;
   const grp = CE('div', { className: 'fill-group' });
 
-  const lbText = part.form_title || 'Questions 51–55';
-  grp.appendChild(CE('div', { className: 'fill-group-label', textContent: lbText }));
+  const formQs = part.questions || [];
+  const formLabel = formQs.length
+    ? `Questions ${formQs[0].num}–${formQs[formQs.length - 1].num}`
+    : (part.form_title || 'Questions');
+  grp.appendChild(CE('div', { className: 'fill-group-label', textContent: formLabel }));
 
   // Form image (part.imgSrc) → unified clickable part image
   if (part.imgSrc) {
@@ -605,6 +794,13 @@ function restoreAnswers() {
       btn.classList.add('selected');
       return;
     }
+    const lbtn = answerContent.querySelector(`.match-lbtn[data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
+    if (lbtn) {
+      answerContent.querySelectorAll(`.match-lbtn[data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`)
+        .forEach(b => b.classList.remove('selected'));
+      lbtn.classList.add('selected');
+      return;
+    }
     const sel = $(`sel_${k}`);
     if (sel) { sel.value = val; return; }
     const inp = $(`inp_${k}`);
@@ -638,7 +834,7 @@ function countAnswers() {
 
 function updateAnswerStatus() {
   const { total, done } = countAnswers();
-  answerStatus.textContent = `${done}/${total} câu đã làm`;
+  answerStatus.textContent = `${done}/${total}`;
   answerStatus.style.color = done === total ? '#22c55e' : '#94a3b8';
   $('unanswered-count').textContent = total - done;
 }
@@ -654,7 +850,7 @@ function markAnswers() {
   const data = QUESTIONS[S.exam];
   if (!data) return;
 
-  answerContent.querySelectorAll('.cbtn, .match-sel, input, textarea')
+  answerContent.querySelectorAll('.cbtn, .match-lbtn, .match-sel, input, textarea')
     .forEach(el => { el.disabled = true; });
 
   data.sections.forEach(sec => {
@@ -663,17 +859,26 @@ function markAnswers() {
 
       if (part.type === 'matching') {
         const correctMap = part.answers || {};
+        const isBtn = (part.id === 'p1' || part.id === 'ls2');
         (part.questions || []).forEach(item => {
           const k = key(sec.id, part.id, item.num);
-          const correct = correctMap[item.num];
-          const user = S.answers[k];
-          const sel = $(`sel_${k}`);
+          const correct = String(correctMap[item.num] || '');
+          const user = S.answers[k] || '';
           const fb = $(`fb_${k}`);
           if (!correct) return;
-          if (sel) sel.classList.add(user === String(correct) ? 'correct-fill' : 'wrong-fill');
+          if (isBtn) {
+            answerContent.querySelectorAll(`.match-lbtn[data-sec="${sec.id}"][data-part="${part.id}"][data-num="${item.num}"]`)
+              .forEach(b => {
+                if (b.dataset.val === correct) b.classList.add('lbtn-correct');
+                else if (b.dataset.val === user && user !== correct) b.classList.add('lbtn-wrong');
+              });
+          } else {
+            const sel = $(`sel_${k}`);
+            if (sel) sel.classList.add(user === correct ? 'correct-fill' : 'wrong-fill');
+          }
           if (fb) {
-            fb.className = 'q-fb ' + (user === String(correct) ? 'ok' : 'bad');
-            fb.textContent = user === String(correct) ? '✓ Đúng' : `✗ Đáp án: ${correct}`;
+            fb.className = 'q-fb ' + (user === correct ? 'ok' : 'bad');
+            fb.textContent = user === correct ? '✓ Đúng' : `✗ Đáp án: ${correct}`;
           }
         });
         return;
@@ -701,7 +906,7 @@ function markAnswers() {
           const accepted = Array.isArray(q.ans)
             ? q.ans.map(a => a.toLowerCase().trim())
             : [(q.ans || '').toLowerCase().trim()];
-          if (q.alts) q.alts.forEach(a => accepted.push(a.toLowerCase().trim()));
+          if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
           const isOk = userLow !== '' && accepted.some(a => a && userLow === a);
           const displayAns = Array.isArray(q.ans) ? q.ans.join(' / ') : q.ans;
           const hasAns = Array.isArray(q.ans) ? q.ans.length > 0 : !!q.ans;
@@ -743,7 +948,7 @@ function showResults() {
         const accepted = Array.isArray(q.ans)
           ? q.ans.map(a => a.toLowerCase().trim())
           : [(q.ans || '').toLowerCase().trim()];
-        if (q.alts) q.alts.forEach(a => accepted.push(a.toLowerCase().trim()));
+        if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
         const hasAns = accepted.some(a => a.length > 0);
         if (!hasAns) return;
         if (!user) skip++;
@@ -776,8 +981,10 @@ function showResults() {
 // ── RESET ─────────────────────────────────────────────────────
 function resetExam() {
   S.answers = {}; S.submitted = false;
+  S.timerSeconds = EXAM_DURATION;
   save();
   answerContent.querySelectorAll('.cbtn').forEach(b => { b.disabled = false; b.classList.remove('selected','correct','wrong-sel'); });
+  answerContent.querySelectorAll('.match-lbtn').forEach(b => { b.disabled = false; b.classList.remove('selected','lbtn-correct','lbtn-wrong'); });
   answerContent.querySelectorAll('.match-sel').forEach(s => { s.disabled = false; s.value = ''; s.classList.remove('correct-fill','wrong-fill'); });
   answerContent.querySelectorAll('input').forEach(i => { i.disabled = false; i.value = ''; i.classList.remove('correct-fill','wrong-fill'); });
   answerContent.querySelectorAll('textarea').forEach(t => { t.disabled = false; t.value = ''; });
@@ -785,16 +992,68 @@ function resetExam() {
   answerContent.querySelectorAll('.wc').forEach(w => { w.textContent = '0 từ'; });
   resultPanel.classList.add('hidden');
   scoreBadge.classList.add('hidden');
+  answerContent.scrollTop = 0;
+  startTimer();
   updateUI();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = CE('div', { className: 'toast', textContent: msg });
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('toast--show'));
+  setTimeout(() => {
+    t.classList.remove('toast--show');
+    setTimeout(() => t.remove(), 400);
+  }, 3000);
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
 function key(secId, partId, num) { return `${secId}_${partId}_${num}`; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── TIMER ─────────────────────────────────────────────────────
+function renderTimer(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  timerText.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  timerBadge.classList.remove('warn','urgent');
+  if (secs <= 60) timerBadge.classList.add('urgent');
+  else if (secs <= 300) timerBadge.classList.add('warn');
+}
+
+function startTimer() {
+  stopTimer();
+  renderTimer(S.timerSeconds);
+  if (S.submitted) return;
+  S.timerInterval = setInterval(() => {
+    S.timerSeconds--;
+    if (S.timerSeconds < 0) S.timerSeconds = 0;
+    renderTimer(S.timerSeconds);
+    save();
+    if (S.timerSeconds === 0) {
+      stopTimer();
+      // Auto-submit when time is up
+      $('modal-submit').classList.add('hidden');
+      S.submitted = true;
+      $('btn-submit').style.display = 'none';
+      markAnswers();
+      const scoreData = showResults();
+      save(scoreData);
+      buildHome();
+      showToast('⏰ Hết giờ! Bài đã được nộp tự động.');
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval = null; }
+}
+
 // ── EVENT LISTENERS ───────────────────────────────────────────
 $('btn-back').addEventListener('click', () => {
   stopActiveAudio();
+  stopTimer();
   examScreen.classList.add('hidden');
   document.title = 'Ôn Thi Tiếng Anh – HUMG';
   buildHome();
@@ -804,6 +1063,7 @@ $('btn-back').addEventListener('click', () => {
 examScreen.addEventListener('click', (e) => {
   if (e.target === examScreen) {
     stopActiveAudio();
+    stopTimer();
     examScreen.classList.add('hidden');
     document.title = 'Ôn Thi Tiếng Anh – HUMG';
     buildHome();
@@ -815,21 +1075,12 @@ $('modal-cancel').addEventListener('click', () => $('modal-submit').classList.ad
 $('modal-confirm').addEventListener('click', () => {
   $('modal-submit').classList.add('hidden');
   S.submitted = true;
+  stopTimer();
   $('btn-submit').style.display = 'none';
   markAnswers();
   const scoreData = showResults();
   save(scoreData);
-  const cards = examGrid.querySelectorAll('.exam-card');
-  if (cards[S.exam - 1]) {
-    cards[S.exam - 1].classList.add('done');
-    if (scoreData) {
-      const cls = scoreData.pct >= 70 ? 'score-hi' : scoreData.pct >= 40 ? 'score-mid' : 'score-lo';
-      let sc = cards[S.exam - 1].querySelector('.card-score');
-      if (!sc) { sc = CE('div', { className: `card-score ${cls}` }); cards[S.exam - 1].appendChild(sc); }
-      sc.className = `card-score ${cls}`;
-      sc.innerHTML = `<span class="score-num">${scoreData.correct}/${scoreData.total}</span><span class="score-pct">${scoreData.pct}%</span>`;
-    }
-  }
+  buildHome();
 });
 
 $('btn-reset').addEventListener('click', () => {
@@ -849,5 +1100,50 @@ document.addEventListener('keydown', e => {
 
 // ── INIT ──────────────────────────────────────────────────────
 buildHome();
+
+// Start exam modal
+$('modal-start-confirm').addEventListener('click', () => {
+  const num = parseInt($('modal-start').dataset.examNum);
+  $('modal-start').classList.add('hidden');
+  try {
+    openExam(num);
+  } catch(err) {
+    console.error('[openExam error]', err);
+    alert('Lỗi mở bài thi: ' + err.message);
+  }
+});
+$('modal-start-cancel').addEventListener('click', () => {
+  $('modal-start').classList.add('hidden');
+});
+$('modal-start-reset').addEventListener('click', () => {
+  const num = parseInt($('modal-start').dataset.examNum);
+  $('modal-start').classList.add('hidden');
+  try {
+    localStorage.removeItem(LS_KEY(num));
+  } catch(e) {}
+  buildHome();
+  openExam(num);
+});
+$('modal-start').addEventListener('click', (e) => {
+  if (e.target === $('modal-start')) $('modal-start').classList.add('hidden');
+});
+
+// Clear history
+$('btn-clear-history').addEventListener('click', () => {
+  $('modal-clear').classList.remove('hidden');
+});
+$('modal-clear-cancel').addEventListener('click', () => {
+  $('modal-clear').classList.add('hidden');
+});
+$('modal-clear-confirm').addEventListener('click', () => {
+  for (let i = 1; i <= 20; i++) {
+    try { localStorage.removeItem(LS_KEY(i)); } catch(e) {}
+  }
+  $('modal-clear').classList.add('hidden');
+  buildHome();
+});
+$('modal-clear').addEventListener('click', (e) => {
+  if (e.target === $('modal-clear')) $('modal-clear').classList.add('hidden');
+});
 
 })();
