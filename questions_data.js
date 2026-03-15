@@ -678,6 +678,10 @@ const QUESTIONS = {
                 "text": "hat"
               },
               {
+                "id": "D",
+                "text": "jacket"
+              },
+              {
                 "id": "E",
                 "text": "jeans"
               },
