@@ -4029,7 +4029,7 @@ const QUESTIONS = {
               {
                 "num": 16,
                 "label": "",
-                "ans": "14 degrees"
+                "ans": "14"
               },
               {
                 "num": 17,
