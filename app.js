@@ -1,5 +1,5 @@
 /* ============================================================
-   Ôn Thi Tiếng Anh HUMG – app.js  (no PDF viewer)
+   English Test – app.js  (no PDF viewer)
    ============================================================ */
 (() => {
 'use strict';
@@ -127,7 +127,7 @@ function openExam(num) {
   }
 
   navTitle.textContent = `Đề ${num}`;
-  document.title = `Đề ${num} – Ôn Thi Tiếng Anh HUMG`;
+  document.title = `Đề ${num} – English Test`;
 
   examScreen.classList.remove('hidden');
 
@@ -1109,7 +1109,7 @@ $('btn-back').addEventListener('click', () => {
   stopActiveAudio();
   stopTimer();
   examScreen.classList.add('hidden');
-  document.title = 'Ôn Thi Tiếng Anh – HUMG';
+  document.title = 'English Test';
   buildHome();
 });
 
@@ -1119,7 +1119,7 @@ examScreen.addEventListener('click', (e) => {
     stopActiveAudio();
     stopTimer();
     examScreen.classList.add('hidden');
-    document.title = 'Ôn Thi Tiếng Anh – HUMG';
+    document.title = 'English Test';
     buildHome();
   }
 });
