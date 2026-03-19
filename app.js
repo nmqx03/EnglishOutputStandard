@@ -10,7 +10,7 @@ const S = {
   answers: {}, submitted: false,
   timerInterval: null, timerSeconds: 0,
 };
-const EXAM_DURATION = 60 * 60; // 60 minutes
+const EXAM_DURATION = 90 * 60; // 90 minutes
 const LS_KEY = (n) => `humg_v2_exam_${n}`;
 
 // ── DOM ──────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ function showStartModal(num) {
   $('modal-start-icon').textContent = hasSaved ? '📂' : '📝';
   $('modal-start-desc').textContent = hasSaved
     ? (saved.submitted ? `Đã nộp bài · ${saved.score ? saved.score.correct + '/' + saved.score.total + ' câu đúng' : ''}` : 'Đang làm dở · Tiếp tục bài thi')
-    : 'Thời gian: 60 phút';
+    : 'Thời gian: 90 phút';
   $('modal-start-confirm').textContent = '';
   $('modal-start-confirm').innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> ' + (hasSaved ? 'Tiếp tục bài thi' : 'Bắt đầu làm bài');
   // Show/hide "Làm lại" button
@@ -929,6 +929,30 @@ function showResults() {
   if (!data) return;
   let correct = 0, wrong = 0, skip = 0;
 
+  // Per-section counters
+  const nghe = { correct: 0, total: 0 };
+  const doc  = { correct: 0, total: 0 }; // q.num 1-35
+  const viet = { correct: 0, total: 0 }; // q.num 36-55
+
+  function isNghe(secId) {
+    const s = (secId || '').toLowerCase();
+    return s.includes('ls') || s.includes('listen') || s.includes('nghe');
+  }
+
+  function scoreQ(q, secId, partId, bucket) {
+    const user = (S.answers[key(secId, partId, q.num)] || '').toLowerCase().trim();
+    const accepted = Array.isArray(q.ans)
+      ? q.ans.map(a => a.toLowerCase().trim())
+      : [(q.ans || '').toLowerCase().trim()];
+    if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+    const hasAns = accepted.some(a => a.length > 0);
+    if (!hasAns) return;
+    bucket.total++;
+    if (!user) { skip++; }
+    else if (accepted.some(a => a && user === a)) { correct++; bucket.correct++; }
+    else { wrong++; }
+  }
+
   data.sections.forEach(sec => {
     (sec.parts || []).forEach(part => {
       if (part.type === 'writing') return;
@@ -940,22 +964,18 @@ function showResults() {
           const ans = String(correctMap[item.num] || '').trim();
           const user = (S.answers[k] || '').trim();
           if (!ans) return;
-          if (!user) skip++; else if (user === ans) correct++; else wrong++;
+          const bucket = isNghe(sec.id) ? nghe : (item.num <= 35 ? doc : viet);
+          bucket.total++;
+          if (!user) skip++;
+          else if (user === ans) { correct++; bucket.correct++; }
+          else wrong++;
         });
         return;
       }
 
       (part.questions || []).forEach(q => {
-        const user = (S.answers[key(sec.id, part.id, q.num)] || '').toLowerCase().trim();
-        const accepted = Array.isArray(q.ans)
-          ? q.ans.map(a => a.toLowerCase().trim())
-          : [(q.ans || '').toLowerCase().trim()];
-        if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
-        const hasAns = accepted.some(a => a.length > 0);
-        if (!hasAns) return;
-        if (!user) skip++;
-        else if (accepted.some(a => a && user === a)) correct++;
-        else wrong++;
+        const bucket = isNghe(sec.id) ? nghe : (q.num <= 35 ? doc : viet);
+        scoreQ(q, sec.id, part.id, bucket);
       });
     });
   });
@@ -969,6 +989,38 @@ function showResults() {
   $('result-pct').textContent = pct + '%';
   scoreText.textContent = `${correct}/${total}`;
   scoreBadge.classList.remove('hidden');
+
+  // Inject section breakdown block if not yet present
+  if (!$('res-section-nghe')) {
+    const breakdown = CE('div', { id: 'res-section-breakdown' });
+    breakdown.style.cssText = 'margin:12px 0 4px;display:flex;flex-direction:column;gap:7px;';
+    const rows = [
+      { id: 'res-section-nghe', label: 'Phần Nghe' },
+      { id: 'res-section-doc',  label: 'Phần Đọc (câu 1-35)' },
+      { id: 'res-section-viet', label: 'Phần Viết (câu 36-55)' },
+    ];
+    rows.forEach(({ id, label }) => {
+      const row = CE('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 10px;background:var(--card,#f8fafc);border-radius:8px;';
+      const lbl = CE('span', { textContent: label });
+      lbl.style.cssText = 'color:var(--text-2,#64748b);font-weight:500;';
+      const val = CE('span', { id });
+      val.style.cssText = 'font-weight:700;color:var(--text-1,#1e293b);';
+      row.appendChild(lbl); row.appendChild(val);
+      breakdown.appendChild(row);
+    });
+    const anchor = $('res-correct') ? $('res-correct').closest('div') : null;
+    if (anchor && anchor.parentNode === resultPanel) anchor.insertAdjacentElement('afterend', breakdown);
+    else resultPanel.insertBefore(breakdown, resultPanel.firstChild);
+  }
+
+  // Update section breakdown
+  const elNghe = $('res-section-nghe');
+  const elDoc  = $('res-section-doc');
+  const elViet = $('res-section-viet');
+  if (elNghe) elNghe.textContent = `${nghe.correct}/${nghe.total} câu`;
+  if (elDoc)  elDoc.textContent  = `${doc.correct}/${doc.total} câu`;
+  if (elViet) elViet.textContent = `${viet.correct}/${viet.total} câu`;
 
   const arc = $('result-arc');
   if (arc) {
