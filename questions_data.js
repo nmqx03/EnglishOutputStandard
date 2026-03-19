@@ -3526,9 +3526,9 @@ const QUESTIONS = {
                 "num": 28,
                 "stem": "28",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "there",
+                  "they",
+                  "where"
                 ],
                 "ans": "A"
               },
@@ -3536,9 +3536,9 @@ const QUESTIONS = {
                 "num": 29,
                 "stem": "29",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "another",
+                  "its",
+                  "these"
                 ],
                 "ans": "C"
               },
@@ -3546,9 +3546,9 @@ const QUESTIONS = {
                 "num": 30,
                 "stem": "30",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "beside",
+                  "next",
+                  "behind"
                 ],
                 "ans": "B"
               },
@@ -3556,9 +3556,9 @@ const QUESTIONS = {
                 "num": 31,
                 "stem": "31",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "known",
+                  "knows",
+                  "know"
                 ],
                 "ans": "B"
               },
@@ -3566,9 +3566,9 @@ const QUESTIONS = {
                 "num": 32,
                 "stem": "32",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "longest",
+                  "long",
+                  "longer"
                 ],
                 "ans": "B"
               },
@@ -3576,9 +3576,9 @@ const QUESTIONS = {
                 "num": 33,
                 "stem": "33",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "get",
+                  "got",
+                  "getting"
                 ],
                 "ans": "A"
               },
@@ -3586,9 +3586,9 @@ const QUESTIONS = {
                 "num": 34,
                 "stem": "34",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "go",
+                  "goes",
+                  "going"
                 ],
                 "ans": "A"
               },
@@ -3596,9 +3596,9 @@ const QUESTIONS = {
                 "num": 35,
                 "stem": "35",
                 "opts": [
-                  "Right",
-                  "Wrong",
-                  "Doesn't say"
+                  "on",
+                  "at",
+                  "from"
                 ],
                 "ans": "C"
               }
