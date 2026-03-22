@@ -8545,7 +8545,7 @@ const QUESTIONS = {
               {
                 "num": 30,
                 "stem": "",
-                "opts": ["a lot", "many", "few"],
+                "opts": ["lot", "many", "few"],
                 "ans": "A"
               },
               {
@@ -9001,12 +9001,13 @@ const QUESTIONS = {
               {
                 "num": 19,
                 "label": "",
-                "ans": "9am-1pm",
+                "ans": "9 a.m to 1 p.m",
                 "alts": [
                   "9am to 1pm",
                   "9a.m to 1p.m",
                   "9am 1pm",
-                  "9 a.m to 1 p.m",
+                  "9 a.m - 1 p.m",
+                  "from 9 a.m to 1 p.m"
                 ]
               },
               {
