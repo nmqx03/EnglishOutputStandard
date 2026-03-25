@@ -1164,35 +1164,31 @@ const PRAC = {
   questions: [],        // flat list of { examNum, secId, part, q }
 };
 
-// Question range groups: reading 1-55, listening 1-25 (adjust to your data)
-// We generate groups of 5 from 1 up to max.
-function getPracGroups(section) {
-  // Scan all exams to find range
-  let minQ = Infinity, maxQ = -Infinity;
-  const secTest = section === 'nghe'
-    ? (id) => { const s = (id||'').toLowerCase(); return s.includes('ls') || s.includes('listen') || s.includes('nghe'); }
-    : (id) => { const s = (id||'').toLowerCase(); return !s.includes('ls') && !s.includes('listen') && !s.includes('nghe') && !s.includes('writ'); };
+// ── FIXED question groups per section ──────────────────────────
+// Reading:  1-5 | 6-10 | 11-15 | 21-27 | 28-35 | 36-40 | 41-50 | 51-55
+// Listening: 1-5 | 6-10 | 11-15 | 16-20 | 21-25
+const PRAC_GROUPS = {
+  doc:  [
+    { from:  1, to:  5,  label: 'Câu 1–5'   },
+    { from:  6, to: 10,  label: 'Câu 6–10'  },
+    { from: 11, to: 15,  label: 'Câu 11–15' },
+    { from: 21, to: 27,  label: 'Câu 21–27' },
+    { from: 28, to: 35,  label: 'Câu 28–35' },
+    { from: 36, to: 40,  label: 'Câu 36–40' },
+    { from: 41, to: 50,  label: 'Câu 41–50' },
+    { from: 51, to: 55,  label: 'Câu 51–55' },
+  ],
+  nghe: [
+    { from:  1, to:  5,  label: 'Câu 1–5'   },
+    { from:  6, to: 10,  label: 'Câu 6–10'  },
+    { from: 11, to: 15,  label: 'Câu 11–15' },
+    { from: 16, to: 20,  label: 'Câu 16–20' },
+    { from: 21, to: 25,  label: 'Câu 21–25' },
+  ],
+};
 
-  for (let i = 1; i <= 20; i++) {
-    const data = (typeof QUESTIONS !== 'undefined') ? QUESTIONS[i] : null;
-    if (!data) continue;
-    data.sections.forEach(sec => {
-      if (!secTest(sec.id)) return;
-      (sec.parts || []).forEach(part => {
-        if (part.type === 'writing') return;
-        (part.questions || []).forEach(q => {
-          if (q.num < minQ) minQ = q.num;
-          if (q.num > maxQ) maxQ = q.num;
-        });
-      });
-    });
-  }
-  if (minQ === Infinity) return [];
-  const groups = [];
-  for (let f = minQ; f <= maxQ; f += 5) {
-    groups.push({ from: f, to: Math.min(f + 4, maxQ) });
-  }
-  return groups;
+function getPracGroups(section) {
+  return PRAC_GROUPS[section] || [];
 }
 
 function buildPracGroupGrid() {
@@ -1203,7 +1199,7 @@ function buildPracGroupGrid() {
   const groups = getPracGroups(PRAC.section);
   groups.forEach(g => {
     const btn = CE('button', { className: 'prac-group-btn' });
-    btn.innerHTML = `<span class="prac-group-range">Câu ${g.from}–${g.to}</span><span class="prac-group-count">× 20 đề</span>`;
+    btn.innerHTML = `<span class="prac-group-range">${g.label}</span><span class="prac-group-count">× 20 đề</span>`;
     btn.addEventListener('click', () => {
       grid.querySelectorAll('.prac-group-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -1233,28 +1229,59 @@ function closePracticeSelector() {
   homeScreen.classList.remove('hidden');
 }
 
-// Collect all matching questions from all 20 exams
+// Collect all matching questions/parts from all 20 exams for the selected group
 function collectPracQuestions() {
   const { section, group } = PRAC;
   const { from, to } = group;
-  const secTest = section === 'nghe'
-    ? (id) => { const s = (id||'').toLowerCase(); return s.includes('ls') || s.includes('listen') || s.includes('nghe'); }
-    : (id) => { const s = (id||'').toLowerCase(); return !s.includes('ls') && !s.includes('listen') && !s.includes('nghe') && !s.includes('writ'); };
+
+  const isNgheSec = (id) => {
+    const s = (id||'').toLowerCase();
+    return s.includes('ls') || s.includes('listen') || s.includes('nghe');
+  };
+  const secTest = section === 'nghe' ? isNgheSec
+    : (id) => !isNgheSec(id) && !id.toLowerCase().includes('writ');
 
   const list = [];
+
   for (let examNum = 1; examNum <= 20; examNum++) {
     const data = (typeof QUESTIONS !== 'undefined') ? QUESTIONS[examNum] : null;
     if (!data) continue;
+
     data.sections.forEach(sec => {
       if (!secTest(sec.id)) return;
+
       (sec.parts || []).forEach(part => {
         if (part.type === 'writing') return;
+
+        // Filter questions that fall in [from, to]
         const qs = (part.questions || []).filter(q => q.num >= from && q.num <= to);
         if (!qs.length) return;
-        list.push({ examNum, secId: sec.id, part: { ...part, questions: qs } });
+
+        // For parts with sub-groups (text_fill / word_fill with groups array),
+        // figure out which sub-group images apply to the filtered questions.
+        let filteredGroups = null;
+        if (part.groups && part.groups.length) {
+          filteredGroups = part.groups
+            .map(grp => {
+              const filteredNums = (grp.nums || []).filter(n => n >= from && n <= to);
+              if (!filteredNums.length) return null;
+              return { ...grp, nums: filteredNums };
+            })
+            .filter(Boolean);
+        }
+
+        const partCopy = {
+          ...part,
+          questions: qs,
+          // Replace groups with only the relevant sub-groups (or null)
+          groups: filteredGroups && filteredGroups.length ? filteredGroups : undefined,
+        };
+
+        list.push({ examNum, secId: sec.id, part: partCopy });
       });
     });
   }
+
   return list;
 }
 
@@ -1292,29 +1319,32 @@ function renderPracAnswerSheet() {
   PRAC.questions.forEach((item, idx) => {
     const { examNum, secId, part } = item;
 
-    // Exam source badge
+    // ── Exam source badge ──
     const badge = CE('div', { className: 'prac-exam-source' });
     badge.textContent = `📝 Đề ${examNum}`;
     content.appendChild(badge);
 
-    // Part instruction
+    // ── Instruction ──
     if (part.instruction) {
       content.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
     }
 
-    // Part image (not for form_fill/word_fill/text_fill which self-render)
+    const isLs1 = (part.id === 'ls1');
     const selfRendersImg = (part.type === 'form_fill' || part.type === 'word_fill' || part.type === 'text_fill');
-    if (!selfRendersImg && part.imgSrc) {
-      content.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+
+    if (isLs1) {
+      // ls1: audio first, then per-question images are rendered inside renderPracMCQ
+      if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `prac_e${examNum}_${part.id}`));
+    } else {
+      // Part-level image (not for self-rendering types)
+      if (!selfRendersImg && part.imgSrc) {
+        content.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+      }
+      // Audio after image
+      if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `prac_e${examNum}_${part.id}`));
     }
 
-    // Audio player
-    if (part.audioSrc) {
-      content.appendChild(renderAudioPlayer(part.audioSrc, `prac_e${examNum}_${part.id}`));
-    }
-
-    // Questions — using prac wrappers so keys are unique per exam
-    const partWithPracKeys = { ...part, _examNum: examNum };
+    // ── Questions block ──
     let qBlock;
     switch (part.type) {
       case 'matching':  qBlock = renderPracMatching(examNum, secId, part); break;
@@ -1332,7 +1362,6 @@ function renderPracAnswerSheet() {
     }
   });
 
-  // Restore answers if any
   if (Object.keys(PRAC.answers).length) restorePracAnswers();
 }
 
@@ -1515,17 +1544,20 @@ function onPracMatchChange(e) {
 function renderPracWordFill(examNum, secId, part) {
   const wrap = CE('div');
   const questions = part.questions || [];
+
   if (part.groups && part.groups.length) {
     part.groups.forEach(grp => {
       const grpNums = new Set(grp.nums);
       const grpQs = questions.filter(q => grpNums.has(q.num));
       if (!grpQs.length) return;
       const grpWrap = CE('div', { className: 'fill-group' });
+      // Sub-group image
       if (grp.imgSrc) grpWrap.appendChild(makePartImgEl(grp.imgSrc, `Đề ${examNum}`));
       grpQs.forEach(q => grpWrap.appendChild(buildPracFillRow(examNum, secId, part, q)));
       wrap.appendChild(grpWrap);
     });
   } else {
+    // No sub-groups — part-level image already rendered above
     questions.forEach(q => wrap.appendChild(buildPracFillRow(examNum, secId, part, q)));
   }
   return wrap;
