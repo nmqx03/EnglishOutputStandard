@@ -1152,6 +1152,647 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') $('modal-submit').classList.add('hidden');
 });
 
+// ══════════════════════════════════════════════════════════════
+// PRACTICE MODE
+// ══════════════════════════════════════════════════════════════
+
+const PRAC = {
+  section: 'doc',       // 'doc' | 'nghe'
+  group: null,          // { from, to } e.g. { from:1, to:5 }
+  answers: {},
+  submitted: false,
+  questions: [],        // flat list of { examNum, secId, part, q }
+};
+
+// Question range groups: reading 1-55, listening 1-25 (adjust to your data)
+// We generate groups of 5 from 1 up to max.
+function getPracGroups(section) {
+  // Scan all exams to find range
+  let minQ = Infinity, maxQ = -Infinity;
+  const secTest = section === 'nghe'
+    ? (id) => { const s = (id||'').toLowerCase(); return s.includes('ls') || s.includes('listen') || s.includes('nghe'); }
+    : (id) => { const s = (id||'').toLowerCase(); return !s.includes('ls') && !s.includes('listen') && !s.includes('nghe') && !s.includes('writ'); };
+
+  for (let i = 1; i <= 20; i++) {
+    const data = (typeof QUESTIONS !== 'undefined') ? QUESTIONS[i] : null;
+    if (!data) continue;
+    data.sections.forEach(sec => {
+      if (!secTest(sec.id)) return;
+      (sec.parts || []).forEach(part => {
+        if (part.type === 'writing') return;
+        (part.questions || []).forEach(q => {
+          if (q.num < minQ) minQ = q.num;
+          if (q.num > maxQ) maxQ = q.num;
+        });
+      });
+    });
+  }
+  if (minQ === Infinity) return [];
+  const groups = [];
+  for (let f = minQ; f <= maxQ; f += 5) {
+    groups.push({ from: f, to: Math.min(f + 4, maxQ) });
+  }
+  return groups;
+}
+
+function buildPracGroupGrid() {
+  const grid = $('prac-group-grid');
+  grid.innerHTML = '';
+  PRAC.group = null;
+  updatePracStartBtn();
+  const groups = getPracGroups(PRAC.section);
+  groups.forEach(g => {
+    const btn = CE('button', { className: 'prac-group-btn' });
+    btn.innerHTML = `<span class="prac-group-range">Câu ${g.from}–${g.to}</span><span class="prac-group-count">× 20 đề</span>`;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.prac-group-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      PRAC.group = g;
+      updatePracStartBtn();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function updatePracStartBtn() {
+  $('prac-start-btn').disabled = !PRAC.group;
+}
+
+function openPracticeSelector() {
+  homeScreen.classList.add('hidden');
+  $('practice-screen').classList.remove('hidden');
+  PRAC.section = 'doc';
+  PRAC.group = null;
+  // Set active tab
+  document.querySelectorAll('.prac-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === PRAC.section));
+  buildPracGroupGrid();
+}
+
+function closePracticeSelector() {
+  $('practice-screen').classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+}
+
+// Collect all matching questions from all 20 exams
+function collectPracQuestions() {
+  const { section, group } = PRAC;
+  const { from, to } = group;
+  const secTest = section === 'nghe'
+    ? (id) => { const s = (id||'').toLowerCase(); return s.includes('ls') || s.includes('listen') || s.includes('nghe'); }
+    : (id) => { const s = (id||'').toLowerCase(); return !s.includes('ls') && !s.includes('listen') && !s.includes('nghe') && !s.includes('writ'); };
+
+  const list = [];
+  for (let examNum = 1; examNum <= 20; examNum++) {
+    const data = (typeof QUESTIONS !== 'undefined') ? QUESTIONS[examNum] : null;
+    if (!data) continue;
+    data.sections.forEach(sec => {
+      if (!secTest(sec.id)) return;
+      (sec.parts || []).forEach(part => {
+        if (part.type === 'writing') return;
+        const qs = (part.questions || []).filter(q => q.num >= from && q.num <= to);
+        if (!qs.length) return;
+        list.push({ examNum, secId: sec.id, part: { ...part, questions: qs } });
+      });
+    });
+  }
+  return list;
+}
+
+function pracKey(examNum, secId, partId, num) {
+  return `e${examNum}_${secId}_${partId}_${num}`;
+}
+
+function startPractice() {
+  PRAC.answers = {};
+  PRAC.submitted = false;
+  PRAC.questions = collectPracQuestions();
+
+  if (!PRAC.questions.length) {
+    showToast('⚠️ Không tìm thấy câu hỏi cho dạng này.');
+    return;
+  }
+
+  const secLabel = PRAC.section === 'nghe' ? 'Phần Nghe' : 'Phần Đọc';
+  $('prac-exam-title').textContent = `${secLabel} · Câu ${PRAC.group.from}–${PRAC.group.to}`;
+
+  $('practice-screen').classList.add('hidden');
+  $('prac-exam-screen').classList.remove('hidden');
+  $('prac-result-panel').classList.add('hidden');
+  $('prac-btn-submit').style.display = '';
+
+  renderPracAnswerSheet();
+  updatePracUI();
+}
+
+function renderPracAnswerSheet() {
+  const content = $('prac-answer-content');
+  content.innerHTML = '';
+  $('prac-result-panel').classList.add('hidden');
+
+  PRAC.questions.forEach((item, idx) => {
+    const { examNum, secId, part } = item;
+
+    // Exam source badge
+    const badge = CE('div', { className: 'prac-exam-source' });
+    badge.textContent = `📝 Đề ${examNum}`;
+    content.appendChild(badge);
+
+    // Part instruction
+    if (part.instruction) {
+      content.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
+    }
+
+    // Part image (not for form_fill/word_fill/text_fill which self-render)
+    const selfRendersImg = (part.type === 'form_fill' || part.type === 'word_fill' || part.type === 'text_fill');
+    if (!selfRendersImg && part.imgSrc) {
+      content.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+    }
+
+    // Audio player
+    if (part.audioSrc) {
+      content.appendChild(renderAudioPlayer(part.audioSrc, `prac_e${examNum}_${part.id}`));
+    }
+
+    // Questions — using prac wrappers so keys are unique per exam
+    const partWithPracKeys = { ...part, _examNum: examNum };
+    let qBlock;
+    switch (part.type) {
+      case 'matching':  qBlock = renderPracMatching(examNum, secId, part); break;
+      case 'mcq':       qBlock = renderPracMCQ(examNum, secId, part); break;
+      case 'word_fill':
+      case 'text_fill': qBlock = renderPracWordFill(examNum, secId, part); break;
+      case 'form_fill': qBlock = renderPracFormFill(examNum, secId, part); break;
+      default:          qBlock = renderPracMCQ(examNum, secId, part); break;
+    }
+    content.appendChild(qBlock);
+
+    // Divider between exams (not after last)
+    if (idx < PRAC.questions.length - 1) {
+      content.appendChild(CE('hr', { className: 'prac-exam-divider' }));
+    }
+  });
+
+  // Restore answers if any
+  if (Object.keys(PRAC.answers).length) restorePracAnswers();
+}
+
+// ── PRAC MCQ ──
+function renderPracMCQ(examNum, secId, part) {
+  const wrap = CE('div');
+  (part.questions || []).forEach(q => {
+    const qk = pracKey(examNum, secId, part.id, q.num);
+    const row = CE('div', { className: 'q-row', id: `pqrow_${qk}` });
+
+    if (q.qImgSrc) {
+      const qImgEl = makePartImgEl(q.qImgSrc, `Câu ${q.num}`);
+      qImgEl.classList.add('q-img-wrap');
+      row.appendChild(qImgEl);
+    }
+
+    const stem = CE('div', { className: 'q-stem' });
+    stem.innerHTML = (q.stem && !q.stem.match(/^\d+$/))
+      ? `<span class="q-num">${q.num}.</span> ${esc(q.stem)}`
+      : `<span class="q-num">${q.num}.</span>`;
+    row.appendChild(stem);
+
+    const isVertical = (part.id === 'p3');
+    const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
+    const labels = ['A','B','C'];
+    (q.opts || []).forEach((opt, idx) => {
+      const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}  ${opt}` });
+      btn.dataset.examNum = examNum;
+      btn.dataset.sec = secId; btn.dataset.part = part.id;
+      btn.dataset.num = q.num; btn.dataset.val = labels[idx];
+      btn.addEventListener('click', onPracMCQClick);
+      ch.appendChild(btn);
+    });
+    row.appendChild(ch);
+    row.appendChild(CE('div', { className: 'q-fb', id: `pfb_${qk}` }));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function onPracMCQClick(e) {
+  if (PRAC.submitted) return;
+  const { examNum, sec, part, num, val } = e.currentTarget.dataset;
+  const k = pracKey(examNum, sec, part, num);
+  if (PRAC.answers[k] === val) {
+    delete PRAC.answers[k];
+    $('prac-answer-content').querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.remove('selected'));
+  } else {
+    PRAC.answers[k] = val;
+    $('prac-answer-content').querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
+  updatePracUI();
+}
+
+// ── PRAC MATCHING ──
+function renderPracMatching(examNum, secId, part) {
+  const wrap = CE('div');
+  const isP1  = (part.id === 'p1');
+  const isLs2 = (part.id === 'ls2');
+
+  if (isP1 || isLs2) {
+    const opts = part.options || [];
+    const questions = part.questions || [];
+
+    if (isLs2) {
+      const inst = part.instruction || '';
+      const mTitle = inst.match(/Match (.+?) with (?:their )?(.+?)\.?$/i);
+      const col1Title = mTitle ? mTitle[1].trim() : 'Câu hỏi';
+      const col2Title = mTitle ? mTitle[2].trim() : 'Đáp án';
+      const table = CE('div', { className: 'ls2-table' });
+      const leftCol = CE('div', { className: 'ls2-col ls2-col--left' });
+      leftCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col1Title }));
+      questions.forEach(item => {
+        const k = pracKey(examNum, secId, part.id, item.num);
+        const cell = CE('div', { className: 'ls2-cell ls2-cell--with-btns' });
+        const row = CE('div', { className: 'ls2-row' });
+        row.innerHTML = `<span class="ls2-q-num">${item.num}.</span><span class="ls2-q-text">${esc(item.text || '')}</span>`;
+        cell.appendChild(row);
+        const btnGrid = CE('div', { className: 'ls2-btn-grid' });
+        opts.forEach(o => {
+          const btn = CE('button', { className: 'match-lbtn' });
+          btn.textContent = o.id;
+          btn.dataset.examNum = examNum; btn.dataset.sec = secId;
+          btn.dataset.part = part.id; btn.dataset.num = item.num; btn.dataset.val = o.id;
+          btn.addEventListener('click', onPracMatchBtnClick);
+          btnGrid.appendChild(btn);
+        });
+        cell.appendChild(btnGrid);
+        cell.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
+        leftCol.appendChild(cell);
+      });
+      const rightCol = CE('div', { className: 'ls2-col ls2-col--right' });
+      rightCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: col2Title }));
+      opts.forEach(o => {
+        const item = CE('div', { className: 'ls2-opt-item' });
+        item.innerHTML = `<span class="match-opt-letter">${o.id}</span><span class="ls2-opt-text">${esc(o.text)}</span>`;
+        rightCol.appendChild(item);
+      });
+      table.appendChild(leftCol); table.appendChild(rightCol);
+      wrap.appendChild(table);
+      return wrap;
+    }
+
+    if (isP1 && opts.length) {
+      const optList = CE('div', { className: 'match-opt-list match-opt-list--letters' });
+      opts.forEach(o => {
+        const item = CE('div', { className: 'match-opt-item' });
+        item.innerHTML = `<span class="match-opt-letter">${o.id}</span>`;
+        optList.appendChild(item);
+      });
+      wrap.appendChild(optList);
+    }
+    questions.forEach(item => {
+      const k = pracKey(examNum, secId, part.id, item.num);
+      const div = CE('div', { className: 'match-q match-q--btn' });
+      div.appendChild(CE('span', { className: 'match-q-num', textContent: `${item.num}.` }));
+      const btnRow = CE('div', { className: 'match-btn-row' });
+      opts.forEach(o => {
+        const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
+        btn.dataset.examNum = examNum; btn.dataset.sec = secId;
+        btn.dataset.part = part.id; btn.dataset.num = item.num; btn.dataset.val = o.id;
+        btn.addEventListener('click', onPracMatchBtnClick);
+        btnRow.appendChild(btn);
+      });
+      div.appendChild(btnRow);
+      div.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
+      wrap.appendChild(div);
+    });
+    return wrap;
+  }
+
+  // Default: select
+  const optsHtml = ['<option value="">-- Chọn --</option>',
+    ...(part.options || []).map(o => `<option value="${o.id}">${o.id} – ${esc(o.text)}</option>`)
+  ].join('');
+  (part.questions || []).forEach(item => {
+    const k = pracKey(examNum, secId, part.id, item.num);
+    const div = CE('div', { className: 'match-q' });
+    const txt = CE('div', { className: 'match-txt' });
+    txt.innerHTML = `<span class="q-num">${item.num}.</span> ${esc(item.text || '')}`;
+    div.appendChild(txt);
+    const sel = CE('select', { className: 'match-sel', id: `psel_${k}` });
+    sel.innerHTML = optsHtml;
+    sel.dataset.examNum = examNum; sel.dataset.sec = secId;
+    sel.dataset.part = part.id; sel.dataset.num = item.num;
+    sel.addEventListener('change', onPracMatchChange);
+    div.appendChild(sel);
+    div.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
+    wrap.appendChild(div);
+  });
+  return wrap;
+}
+
+function onPracMatchBtnClick(e) {
+  if (PRAC.submitted) return;
+  const { examNum, sec, part, num, val } = e.currentTarget.dataset;
+  const k = pracKey(examNum, sec, part, num);
+  if (PRAC.answers[k] === val) {
+    delete PRAC.answers[k];
+    $('prac-answer-content').querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.remove('selected'));
+  } else {
+    PRAC.answers[k] = val;
+    $('prac-answer-content').querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
+      .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
+  updatePracUI();
+}
+
+function onPracMatchChange(e) {
+  if (PRAC.submitted) return;
+  const { examNum, sec, part, num } = e.target.dataset;
+  PRAC.answers[pracKey(examNum, sec, part, num)] = e.target.value;
+  updatePracUI();
+}
+
+// ── PRAC WORD FILL ──
+function renderPracWordFill(examNum, secId, part) {
+  const wrap = CE('div');
+  const questions = part.questions || [];
+  if (part.groups && part.groups.length) {
+    part.groups.forEach(grp => {
+      const grpNums = new Set(grp.nums);
+      const grpQs = questions.filter(q => grpNums.has(q.num));
+      if (!grpQs.length) return;
+      const grpWrap = CE('div', { className: 'fill-group' });
+      if (grp.imgSrc) grpWrap.appendChild(makePartImgEl(grp.imgSrc, `Đề ${examNum}`));
+      grpQs.forEach(q => grpWrap.appendChild(buildPracFillRow(examNum, secId, part, q)));
+      wrap.appendChild(grpWrap);
+    });
+  } else {
+    questions.forEach(q => wrap.appendChild(buildPracFillRow(examNum, secId, part, q)));
+  }
+  return wrap;
+}
+
+function renderPracFormFill(examNum, secId, part) {
+  const wrap = CE('div');
+  const grp = CE('div', { className: 'fill-group' });
+  if (part.imgSrc) grp.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+  (part.questions || []).forEach(q => {
+    const k = pracKey(examNum, secId, part.id, q.num);
+    const row = CE('div', { className: 'fill-row form-fill-row', id: `pqrow_${k}` });
+    const lbl = CE('div', { className: 'form-fill-label' });
+    lbl.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.label || '')}`;
+    row.appendChild(lbl);
+    const fw = CE('div', { className: 'fill-wrap' });
+    if (q.prefix) fw.appendChild(CE('span', { className: 'fill-pre', textContent: q.prefix }));
+    const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: '...', id: `pinp_${k}`, autocomplete: 'off' });
+    inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
+    inp.addEventListener('input', onPracFillInput);
+    fw.appendChild(inp);
+    if (q.suffix) fw.appendChild(CE('span', { className: 'fill-suf', textContent: q.suffix }));
+    row.appendChild(fw);
+    row.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
+    grp.appendChild(row);
+  });
+  wrap.appendChild(grp);
+  return wrap;
+}
+
+function buildPracFillRow(examNum, secId, part, q) {
+  const k = pracKey(examNum, secId, part.id, q.num);
+  const row = CE('div', { className: 'fill-row', id: `pqrow_${k}` });
+  const hasStem = q.stem && !q.stem.match(/^\(Xem/);
+  if (hasStem) {
+    const stem = CE('div', { className: 'q-stem' });
+    stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}${q.hint ? `<span class="fill-hint"> (${esc(q.hint)})</span>` : ''}`;
+    row.appendChild(stem);
+  }
+  const inpRow = CE('div', { className: 'fill-inp-row' });
+  inpRow.appendChild(CE('span', { className: 'fill-num-badge', textContent: `${q.num}.` }));
+  const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: 'Nhập từ...', id: `pinp_${k}`, autocomplete: 'off' });
+  inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
+  inp.addEventListener('input', onPracFillInput);
+  inpRow.appendChild(inp);
+  row.appendChild(inpRow);
+  row.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
+  return row;
+}
+
+function onPracFillInput(e) {
+  const { examNum, sec, part, num } = e.target.dataset;
+  PRAC.answers[pracKey(examNum, sec, part, num)] = e.target.value.trim();
+  updatePracUI();
+}
+
+// ── PRAC RESTORE ──
+function restorePracAnswers() {
+  const content = $('prac-answer-content');
+  Object.entries(PRAC.answers).forEach(([k, val]) => {
+    if (!val) return;
+    const parts = k.split('_'); // e1_secId_partId_num
+    const [epart, secId, partId, num] = parts;
+    const examNum = epart.slice(1);
+    const btn = content.querySelector(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
+    if (btn) {
+      content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      return;
+    }
+    const lbtn = content.querySelector(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
+    if (lbtn) {
+      content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`).forEach(b => b.classList.remove('selected'));
+      lbtn.classList.add('selected');
+      return;
+    }
+    const sel = $(`psel_${k}`);
+    if (sel) { sel.value = val; return; }
+    const inp = $(`pinp_${k}`);
+    if (inp) inp.value = val;
+  });
+}
+
+// ── PRAC COUNT ──
+function countPracAnswers() {
+  let total = 0, done = 0;
+  PRAC.questions.forEach(({ examNum, secId, part }) => {
+    (part.questions || []).forEach(q => {
+      total++;
+      if (PRAC.answers[pracKey(examNum, secId, part.id, q.num)]) done++;
+    });
+  });
+  return { total, done };
+}
+
+function updatePracUI() {
+  const { total, done } = countPracAnswers();
+  $('prac-answer-status').textContent = `${done}/${total}`;
+  $('prac-answer-status').style.color = done === total ? '#22c55e' : '#94a3b8';
+  $('prac-unanswered-count').textContent = total - done;
+}
+
+// ── PRAC MARK ──
+function markPracAnswers() {
+  const content = $('prac-answer-content');
+  content.querySelectorAll('.cbtn, .match-lbtn, .match-sel, input').forEach(el => { el.disabled = true; });
+
+  PRAC.questions.forEach(({ examNum, secId, part }) => {
+    if (part.type === 'matching') {
+      const correctMap = part.answers || {};
+      const isBtn = (part.id === 'p1' || part.id === 'ls2');
+      (part.questions || []).forEach(item => {
+        const k = pracKey(examNum, secId, part.id, item.num);
+        const correct = String(correctMap[item.num] || '');
+        const user = PRAC.answers[k] || '';
+        const fb = $(`pfb_${k}`);
+        if (!correct) return;
+        if (isBtn) {
+          content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${item.num}"]`).forEach(b => {
+            if (b.dataset.val === correct) b.classList.add('lbtn-correct');
+            else if (b.dataset.val === user && user !== correct) b.classList.add('lbtn-wrong');
+          });
+        } else {
+          const sel = $(`psel_${k}`);
+          if (sel) sel.classList.add(user === correct ? 'correct-fill' : 'wrong-fill');
+        }
+        if (fb) { fb.className = 'q-fb ' + (user === correct ? 'ok' : 'bad'); fb.textContent = user === correct ? '✓ Đúng' : `✗ Đáp án: ${correct}`; }
+      });
+      return;
+    }
+
+    (part.questions || []).forEach(q => {
+      const k = pracKey(examNum, secId, part.id, q.num);
+      const fb = $(`pfb_${k}`);
+      if (part.type === 'mcq') {
+        const correct = (q.ans || '').toUpperCase().trim();
+        const user = (PRAC.answers[k] || '').toUpperCase().trim();
+        content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${q.num}"]`).forEach(btn => {
+          if (btn.dataset.val === correct && correct) btn.classList.add('correct');
+          if (btn.dataset.val === user && user !== correct) btn.classList.add('wrong-sel');
+        });
+        if (fb && correct) { fb.className = 'q-fb ' + (user === correct ? 'ok' : 'bad'); fb.textContent = user === correct ? '✓ Đúng' : `✗ Đáp án: ${correct}`; }
+      } else if (part.type === 'word_fill' || part.type === 'text_fill' || part.type === 'form_fill') {
+        const inp = $(`pinp_${k}`);
+        const userLow = (PRAC.answers[k] || '').toLowerCase().trim();
+        const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans || '').toLowerCase().trim()];
+        if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+        const isOk = userLow !== '' && accepted.some(a => a && userLow === a);
+        const displayAns = Array.isArray(q.ans) ? q.ans.join(' / ') : q.ans;
+        const hasAns = Array.isArray(q.ans) ? q.ans.length > 0 : !!q.ans;
+        if (inp && hasAns) inp.classList.add(isOk ? 'correct-fill' : 'wrong-fill');
+        if (fb && hasAns) { fb.className = 'q-fb ' + (isOk ? 'ok' : 'bad'); fb.textContent = isOk ? '✓ Đúng' : `✗ Đáp án: ${displayAns}`; }
+      }
+    });
+  });
+}
+
+// ── PRAC RESULTS ──
+function showPracResults() {
+  let correct = 0, wrong = 0, skip = 0;
+  PRAC.questions.forEach(({ examNum, secId, part }) => {
+    if (part.type === 'matching') {
+      const correctMap = part.answers || {};
+      (part.questions || []).forEach(item => {
+        const ans = String(correctMap[item.num] || '').trim();
+        const user = (PRAC.answers[pracKey(examNum, secId, part.id, item.num)] || '').trim();
+        if (!ans) return;
+        if (!user) skip++;
+        else if (user === ans) correct++;
+        else wrong++;
+      });
+      return;
+    }
+    (part.questions || []).forEach(q => {
+      const k = pracKey(examNum, secId, part.id, q.num);
+      const user = (PRAC.answers[k] || '').toLowerCase().trim();
+      const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans || '').toLowerCase().trim()];
+      if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+      const hasAns = accepted.some(a => a.length > 0);
+      if (!hasAns) return;
+      if (!user) skip++;
+      else if (accepted.some(a => a && user === a)) correct++;
+      else wrong++;
+    });
+  });
+
+  const total = correct + wrong + skip;
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  $('prac-res-correct').textContent = correct;
+  $('prac-res-wrong').textContent = wrong;
+  $('prac-res-skip').textContent = skip;
+  $('prac-result-pct').textContent = pct + '%';
+  const arc = $('prac-result-arc');
+  if (arc) {
+    setTimeout(() => { arc.style.strokeDashoffset = 314 - (314 * pct / 100); }, 80);
+    arc.style.stroke = pct >= 70 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#ef4444';
+  }
+  $('prac-result-panel').classList.remove('hidden');
+  $('prac-answer-content').scrollTop = 0;
+}
+
+function resetPracExam() {
+  PRAC.answers = {};
+  PRAC.submitted = false;
+  $('prac-btn-submit').style.display = '';
+  $('prac-result-panel').classList.add('hidden');
+  renderPracAnswerSheet();
+  updatePracUI();
+}
+
+// ── PRAC EVENTS ──
+$('btn-practice-mode').addEventListener('click', openPracticeSelector);
+
+$('prac-btn-back').addEventListener('click', closePracticeSelector);
+$('practice-screen').addEventListener('click', e => {
+  if (e.target === $('practice-screen')) closePracticeSelector();
+});
+
+document.querySelectorAll('.prac-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.prac-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    PRAC.section = tab.dataset.sec;
+    buildPracGroupGrid();
+  });
+});
+
+$('prac-start-btn').addEventListener('click', () => {
+  if (!PRAC.group) return;
+  startPractice();
+});
+
+$('prac-exam-back').addEventListener('click', () => {
+  stopActiveAudio();
+  $('prac-exam-screen').classList.add('hidden');
+  $('practice-screen').classList.remove('hidden');
+});
+$('prac-exam-screen').addEventListener('click', e => {
+  if (e.target === $('prac-exam-screen')) {
+    stopActiveAudio();
+    $('prac-exam-screen').classList.add('hidden');
+    $('practice-screen').classList.remove('hidden');
+  }
+});
+
+$('prac-btn-submit').addEventListener('click', () => $('prac-modal-submit').classList.remove('hidden'));
+$('prac-modal-cancel').addEventListener('click', () => $('prac-modal-submit').classList.add('hidden'));
+$('prac-modal-confirm').addEventListener('click', () => {
+  $('prac-modal-submit').classList.add('hidden');
+  PRAC.submitted = true;
+  $('prac-btn-submit').style.display = 'none';
+  markPracAnswers();
+  showPracResults();
+});
+$('prac-modal-submit').addEventListener('click', e => {
+  if (e.target === $('prac-modal-submit')) $('prac-modal-submit').classList.add('hidden');
+});
+
+$('prac-btn-reset').addEventListener('click', () => {
+  if (confirm('Làm lại từ đầu? Toàn bộ đáp án sẽ bị xoá.')) resetPracExam();
+});
+$('prac-btn-review').addEventListener('click', () => {
+  $('prac-result-panel').classList.add('hidden');
+  $('prac-answer-content').scrollTop = 0;
+});
+$('prac-btn-retry').addEventListener('click', resetPracExam);
+
 // ── INIT ──────────────────────────────────────────────────────
 buildHome();
 

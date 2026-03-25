@@ -12959,7 +12959,9 @@ const QUESTIONS = {
                 "alts": [
                   "wife Keibo",
                   "Keibo Ando",
-                  "wife Keibo Ando"
+                  "wife Keibo Ando",
+                  "Toshi",
+                  "Toshi Ando"
                 ]
               },
               {
@@ -13124,7 +13126,7 @@ const QUESTIONS = {
             "id": "ls3",
             "type": "mcq",
             "instruction": "Questions 11-15: Choose A, B or C.",
-            "audioSrc": "audio/18.3",
+            "audioSrc": "audio/2.3",
             "imgSrc": "",
             "questions": [
               {
