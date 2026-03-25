@@ -2751,7 +2751,7 @@ const QUESTIONS = {
                   "many",
                   "few"
                 ],
-                "ans": "B"
+                "ans": "A"
               },
               {
                 "num": 31,
@@ -2771,7 +2771,7 @@ const QUESTIONS = {
                   "should",
                   "can"
                 ],
-                "ans": "A"
+                "ans": "C"
               },
               {
                 "num": 33,
@@ -2781,7 +2781,7 @@ const QUESTIONS = {
                   "from",
                   "of"
                 ],
-                "ans": "C"
+                "ans": "B"
               },
               {
                 "num": 34,
@@ -2791,7 +2791,7 @@ const QUESTIONS = {
                   "on",
                   "by"
                 ],
-                "ans": "A"
+                "ans": "C"
               },
               {
                 "num": 35,
@@ -2801,7 +2801,7 @@ const QUESTIONS = {
                   "their",
                   "they"
                 ],
-                "ans": "B"
+                "ans": "A"
               }
             ],
             "imgSrc": "images/12.RW2835"
