@@ -1539,7 +1539,7 @@ const QUESTIONS = {
                   "£16",
                   "£60"
                 ],
-                "ans": "A"
+                "ans": "B"
               },
               {
                 "num": 12,
@@ -1549,7 +1549,7 @@ const QUESTIONS = {
                   "two photos",
                   "four photos"
                 ],
-                "ans": "A"
+                "ans": "B"
               },
               {
                 "num": 13,
