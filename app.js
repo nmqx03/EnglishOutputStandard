@@ -1135,6 +1135,7 @@ $('modal-confirm').addEventListener('click', () => {
   const scoreData = showResults();
   save(scoreData);
   buildHome();
+  updateWrongBannerSub();
 });
 
 $('btn-reset').addEventListener('click', () => {
@@ -1825,8 +1826,795 @@ $('prac-btn-review').addEventListener('click', () => {
 });
 $('prac-btn-retry').addEventListener('click', resetPracExam);
 
+// ══════════════════════════════════════════════════════════════
+// WRONG ANSWER REVIEW MODULE
+// ══════════════════════════════════════════════════════════════
+
+const WR = {
+  filter: 'all',   // 'all' | 'doc' | 'nghe'
+  source: null,    // null = all exams, or examNum
+  items: [],       // [{examNum, secId, part (with filtered questions), wrongNums}]
+  answers: {},
+  submitted: false,
+};
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function isNgheSec(secId) {
+  const s = (secId || '').toLowerCase();
+  return s.includes('ls') || s.includes('listen') || s.includes('nghe');
+}
+
+// Return list of wrong question numbers from a saved exam
+// Only counts questions that were ANSWERED INCORRECTLY (not skipped)
+function getWrongItems(examNum, filter) {
+  const saved = loadSaved(examNum);
+  if (!saved || !saved.submitted) return [];
+  const data = QUESTIONS[examNum];
+  if (!data) return [];
+  const answers = saved.answers || {};
+  const wrongs = [];
+
+  data.sections.forEach(sec => {
+    const isNghe = isNgheSec(sec.id);
+    if (filter === 'doc'  && isNghe)  return;
+    if (filter === 'nghe' && !isNghe) return;
+
+    (sec.parts || []).forEach(part => {
+      if (part.type === 'writing') return;
+
+      if (part.type === 'matching') {
+        const correctMap = part.answers || {};
+        (part.questions || []).forEach(item => {
+          const k = key(sec.id, part.id, item.num);
+          const ans = String(correctMap[item.num] || '').trim();
+          if (!ans) return;
+          const user = (answers[k] || '').trim();
+          if (!user) return; // skip = bỏ qua, không tính sai
+          if (user !== ans) wrongs.push({ examNum, secId: sec.id, partId: part.id, num: item.num });
+        });
+        return;
+      }
+
+      (part.questions || []).forEach(q => {
+        const k = key(sec.id, part.id, q.num);
+        const user = (answers[k] || '').toLowerCase().trim();
+        if (!user) return; // chưa làm = bỏ qua
+        const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans || '').toLowerCase().trim()];
+        if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+        const hasAns = accepted.some(a => a.length > 0);
+        if (!hasAns) return;
+        const isOk = accepted.some(a => a && user === a);
+        if (!isOk) wrongs.push({ examNum, secId: sec.id, partId: part.id, num: q.num });
+      });
+    });
+  });
+
+  return wrongs;
+}
+
+// Build summary: mỗi phần tử = { examNum, section, group, wrongCount }
+// Chỉ tạo phần tử khi nhóm đó có ít nhất 1 câu sai
+function buildWrongGroupSummary() {
+  const rows = [];
+  for (let examNum = 1; examNum <= 20; examNum++) {
+    const saved = loadSaved(examNum);
+    if (!saved || !saved.submitted) continue;
+    const data = QUESTIONS[examNum];
+    if (!data) continue;
+    const answers = saved.answers || {};
+
+    // Check each section × group combination
+    ['doc','nghe'].forEach(section => {
+      const groups = PRAC_GROUPS[section] || [];
+      groups.forEach(group => {
+        // Count wrong questions in this exam × section × group
+        let wrongCount = 0;
+        data.sections.forEach(sec => {
+          const isNghe = isNgheSec(sec.id);
+          if (section === 'doc'  && isNghe)  return;
+          if (section === 'nghe' && !isNghe) return;
+          (sec.parts || []).forEach(part => {
+            if (part.type === 'writing') return;
+            if (part.type === 'matching') {
+              const correctMap = part.answers || {};
+              (part.questions || []).forEach(item => {
+                if (item.num < group.from || item.num > group.to) return;
+                const ans = String(correctMap[item.num] || '').trim();
+                if (!ans) return;
+                const user = (answers[key(sec.id, part.id, item.num)] || '').trim();
+                if (!user) return; // chưa làm = bỏ qua
+                if (user !== ans) wrongCount++;
+              });
+            } else {
+              (part.questions || []).forEach(q => {
+                if (q.num < group.from || q.num > group.to) return;
+                const k = key(sec.id, part.id, q.num);
+                const user = (answers[k] || '').toLowerCase().trim();
+                if (!user) return; // chưa làm = bỏ qua
+                const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans||'').toLowerCase().trim()];
+                if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+                const hasAns = accepted.some(a => a.length > 0);
+                if (!hasAns) return;
+                const isOk = accepted.some(a => a && user === a);
+                if (!isOk) wrongCount++;
+              });
+            }
+          });
+        });
+        if (wrongCount > 0) {
+          rows.push({ examNum, section, group, wrongCount });
+        }
+      });
+    });
+  }
+  return rows;
+}
+
+// ── Selector screen ───────────────────────────────────────────
+
+function openWrongReview() {
+  homeScreen.classList.add('hidden');
+  $('wrong-screen').classList.remove('hidden');
+  WR.filter = 'all';
+  renderWrongSelector();
+}
+
+function closeWrongSelector() {
+  $('wrong-screen').classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+  updateWrongBannerSub();
+}
+
+function updateWrongBannerSub() {
+  const rows = buildWrongGroupSummary();
+  const totalQ = rows.reduce((a, r) => a + r.wrongCount, 0);
+  const sub = $('wrong-review-sub');
+  if (sub) sub.textContent = totalQ > 0
+    ? `${totalQ} câu sai · ${rows.length} nhóm cần ôn`
+    : 'Tổng hợp câu sai từ tất cả đề đã nộp';
+}
+
+function renderWrongSelector() {
+  const content = $('wrong-selector-content');
+  content.innerHTML = '';
+
+  const allRows = buildWrongGroupSummary();
+
+  // ── Filter bar ──
+  const filterBar = CE('div', { className: 'wr-filter-bar' });
+  [['all','Tất cả'], ['doc','📖 Đọc'], ['nghe','🎧 Nghe']].forEach(([val, label]) => {
+    const btn = CE('button', {
+      className: 'wr-filter-btn' + (WR.filter === val ? ' active' : ''),
+      textContent: label,
+    });
+    btn.addEventListener('click', () => { WR.filter = val; renderWrongSelector(); });
+    filterBar.appendChild(btn);
+  });
+  content.appendChild(filterBar);
+
+  // Apply filter
+  const rows = WR.filter === 'all' ? allRows
+    : allRows.filter(r => r.section === WR.filter);
+
+  if (!rows.length) {
+    const empty = CE('div', { className: 'wr-empty' });
+    empty.innerHTML = `
+      <div class="wr-empty-icon">🎉</div>
+      <div class="wr-empty-title">Không có câu sai!</div>
+      <div class="wr-empty-sub">Hãy hoàn thành thêm đề thi để xem kết quả tổng hợp.</div>
+    `;
+    content.appendChild(empty);
+    return;
+  }
+
+  // ── Header ──
+  const totalQ = rows.reduce((a, r) => a + r.wrongCount, 0);
+  const hdr = CE('div', { className: 'wr-summary-hdr' });
+  hdr.innerHTML = `
+    <div class="wr-summary-title">Nhóm câu cần ôn lại</div>
+    <div class="wr-summary-count">❌ ${totalQ} câu · ${rows.length} nhóm</div>
+  `;
+  content.appendChild(hdr);
+
+  // ── Group rows sorted by examNum then section then group.from ──
+  const sorted = [...rows].sort((a, b) =>
+    a.examNum - b.examNum ||
+    (a.section === 'doc' ? -1 : 1) - (b.section === 'doc' ? -1 : 1) ||
+    a.group.from - b.group.from
+  );
+
+  // Group by examNum for visual separation
+  const byExam = {};
+  sorted.forEach(r => {
+    if (!byExam[r.examNum]) byExam[r.examNum] = [];
+    byExam[r.examNum].push(r);
+  });
+
+  Object.keys(byExam).map(Number).sort((a,b)=>a-b).forEach(examNum => {
+    // Exam heading
+    const examHdr = CE('div', { className: 'wr-exam-hdr' });
+    const examWrong = byExam[examNum].reduce((a, r) => a + r.wrongCount, 0);
+    examHdr.innerHTML = `
+      <span class="wr-exam-hdr-num">Đề ${examNum}</span>
+      <span class="wr-exam-hdr-count">❌ ${examWrong} câu sai</span>
+    `;
+    content.appendChild(examHdr);
+
+    // Group chips for this exam
+    const chipWrap = CE('div', { className: 'wr-chip-wrap' });
+    byExam[examNum].forEach(row => {
+      const { section, group, wrongCount } = row;
+      const secIcon = section === 'nghe' ? '🎧' : '📖';
+      const chip = CE('button', { className: 'wr-chip' });
+      chip.innerHTML = `
+        <span class="wr-chip-sec">${secIcon}</span>
+        <span class="wr-chip-range">${group.label}</span>
+        <span class="wr-chip-count">❌${wrongCount}</span>
+      `;
+      chip.addEventListener('click', () => startWrongExam(examNum, section, group));
+      chipWrap.appendChild(chip);
+    });
+    content.appendChild(chipWrap);
+  });
+
+  // ── Start All button ──
+  const startAll = CE('button', { className: 'wr-start-all-btn' });
+  startAll.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Ôn tất cả ${totalQ} câu sai (${rows.length} nhóm)`;
+  startAll.addEventListener('click', () => startWrongExam(null, null, null));
+  content.appendChild(startAll);
+}
+
+// ── Build wrong-questions item list ──────────────────────────
+// examNumFilter: null = all exams
+// sectionFilter: 'doc'|'nghe'|null = all
+// groupFilter: { from, to } | null = all groups
+function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
+  const items = [];
+  const exams = examNumFilter
+    ? [examNumFilter]
+    : Array.from({ length: 20 }, (_, i) => i + 1);
+
+  exams.forEach(examNum => {
+    const saved = loadSaved(examNum);
+    if (!saved || !saved.submitted) return;
+    const data = QUESTIONS[examNum];
+    if (!data) return;
+    const answers = saved.answers || {};
+
+    data.sections.forEach(sec => {
+      const isNghe = isNgheSec(sec.id);
+      // section filter
+      if (sectionFilter === 'doc'  && isNghe)  return;
+      if (sectionFilter === 'nghe' && !isNghe) return;
+      // WR.filter also applies when no sectionFilter
+      if (!sectionFilter && WR.filter === 'doc'  && isNghe)  return;
+      if (!sectionFilter && WR.filter === 'nghe' && !isNghe) return;
+
+      (sec.parts || []).forEach(part => {
+        if (part.type === 'writing') return;
+
+        let wrongQs = [];
+
+        if (part.type === 'matching') {
+          const correctMap = part.answers || {};
+          wrongQs = (part.questions || []).filter(item => {
+            if (groupFilter && (item.num < groupFilter.from || item.num > groupFilter.to)) return false;
+            const ans = String(correctMap[item.num] || '').trim();
+            if (!ans) return false;
+            const user = (answers[key(sec.id, part.id, item.num)] || '').trim();
+            if (!user) return false; // chưa làm = bỏ qua
+            return user !== ans;
+          });
+        } else {
+          wrongQs = (part.questions || []).filter(q => {
+            if (groupFilter && (q.num < groupFilter.from || q.num > groupFilter.to)) return false;
+            const k = key(sec.id, part.id, q.num);
+            const user = (answers[k] || '').toLowerCase().trim();
+            if (!user) return false; // chưa làm = bỏ qua
+            const accepted = Array.isArray(q.ans)
+              ? q.ans.map(a => a.toLowerCase().trim())
+              : [(q.ans || '').toLowerCase().trim()];
+            if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+            const hasAns = accepted.some(a => a.length > 0);
+            if (!hasAns) return false;
+            return !accepted.some(a => a && user === a);
+          });
+        }
+
+        if (!wrongQs.length) return;
+
+        // Filter sub-groups for text_fill/word_fill
+        let filteredGroups = undefined;
+        if (part.groups && part.groups.length) {
+          const wrongNums = new Set(wrongQs.map(q => q.num));
+          filteredGroups = part.groups
+            .map(grp => {
+              const filteredNums = (grp.nums || []).filter(n => wrongNums.has(n));
+              return filteredNums.length ? { ...grp, nums: filteredNums } : null;
+            })
+            .filter(Boolean);
+        }
+
+        items.push({
+          examNum, secId: sec.id,
+          part: { ...part, questions: wrongQs, groups: filteredGroups || undefined },
+        });
+      });
+    });
+  });
+
+  return items;
+}
+
+// ── Start wrong exam ─────────────────────────────────────────
+// examNumFilter: null = all, or specific examNum
+// sectionFilter: 'doc'|'nghe'|null
+// groupFilter: { from, to, label }|null
+function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
+  WR.source = examNumFilter;
+  WR.answers = {};
+  WR.submitted = false;
+  WR.items = buildWrongItems(examNumFilter, sectionFilter, groupFilter);
+
+  if (!WR.items.length) {
+    showToast('🎉 Không có câu sai để ôn!');
+    return;
+  }
+
+  // Build nav title
+  const parts = [];
+  if (examNumFilter) parts.push(`Đề ${examNumFilter}`);
+  else parts.push('Tất cả đề');
+  if (sectionFilter === 'doc')  parts.push('Phần Đọc');
+  else if (sectionFilter === 'nghe') parts.push('Phần Nghe');
+  if (groupFilter) parts.push(groupFilter.label);
+  const totalWrong = WR.items.reduce((a, i) => a + i.part.questions.length, 0);
+  parts.push(`${totalWrong} câu sai`);
+
+  $('wrong-exam-title').textContent = parts.join(' · ');
+  $('wrong-screen').classList.add('hidden');
+  $('wrong-exam-screen').classList.remove('hidden');
+  $('wrong-result-panel').classList.add('hidden');
+  $('wrong-btn-submit').style.display = '';
+
+  renderWrongAnswerSheet();
+  updateWrongUI();
+}
+
+// ── Render wrong answer sheet ─────────────────────────────────
+
+function wrKey(examNum, secId, partId, num) {
+  return `wr_e${examNum}_${secId}_${partId}_${num}`;
+}
+
+function renderWrongAnswerSheet() {
+  const content = $('wrong-answer-content');
+  content.innerHTML = '';
+  $('wrong-result-panel').classList.add('hidden');
+
+  // Group items by examNum for cleaner display
+  const byExam = {};
+  WR.items.forEach(item => {
+    if (!byExam[item.examNum]) byExam[item.examNum] = [];
+    byExam[item.examNum].push(item);
+  });
+
+  const examNums = Object.keys(byExam).map(Number).sort((a,b)=>a-b);
+
+  examNums.forEach((examNum, eIdx) => {
+    // Exam separator badge
+    const examBadge = CE('div', { className: 'prac-exam-source prac-exam-source--wrong' });
+    examBadge.innerHTML = `❌ Đề ${examNum} — câu sai`;
+    content.appendChild(examBadge);
+
+    byExam[examNum].forEach((item, pIdx) => {
+      const { secId, part } = item;
+      const isNghe = isNgheSec(secId);
+      const isLs1  = (part.id === 'ls1');
+      const selfRendersImg = (part.type === 'form_fill' || part.type === 'word_fill' || part.type === 'text_fill');
+
+      if (part.instruction) content.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
+
+      if (isLs1) {
+        if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
+      } else {
+        if (!selfRendersImg && part.imgSrc) content.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+        if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
+      }
+
+      let qBlock;
+      switch (part.type) {
+        case 'matching':  qBlock = renderWrMatching(examNum, secId, part); break;
+        case 'mcq':       qBlock = renderWrMCQ(examNum, secId, part); break;
+        case 'word_fill':
+        case 'text_fill': qBlock = renderWrWordFill(examNum, secId, part); break;
+        case 'form_fill': qBlock = renderWrFormFill(examNum, secId, part); break;
+        default:          qBlock = renderWrMCQ(examNum, secId, part); break;
+      }
+      content.appendChild(qBlock);
+    });
+
+    if (eIdx < examNums.length - 1) content.appendChild(CE('hr', { className: 'prac-exam-divider' }));
+  });
+
+  if (Object.keys(WR.answers).length) restoreWrAnswers();
+}
+
+// ── WR MCQ ───────────────────────────────────────────────────
+function renderWrMCQ(examNum, secId, part) {
+  const wrap = CE('div');
+  (part.questions || []).forEach(q => {
+    const qk = wrKey(examNum, secId, part.id, q.num);
+    const row = CE('div', { className: 'q-row', id: `wrrow_${qk}` });
+    if (q.qImgSrc) { const img = makePartImgEl(q.qImgSrc, `Câu ${q.num}`); img.classList.add('q-img-wrap'); row.appendChild(img); }
+    const stem = CE('div', { className: 'q-stem' });
+    stem.innerHTML = (q.stem && !q.stem.match(/^\d+$/)) ? `<span class="q-num">${q.num}.</span> ${esc(q.stem)}` : `<span class="q-num">${q.num}.</span>`;
+    row.appendChild(stem);
+    const isVertical = (part.id === 'p3');
+    const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
+    ['A','B','C'].forEach((lbl, idx) => {
+      if (!(q.opts||[])[idx]) return;
+      const btn = CE('button', { className: 'cbtn', textContent: `${lbl}  ${q.opts[idx]}` });
+      btn.dataset.examNum = examNum; btn.dataset.sec = secId; btn.dataset.part = part.id; btn.dataset.num = q.num; btn.dataset.val = lbl;
+      btn.addEventListener('click', onWrMCQClick);
+      ch.appendChild(btn);
+    });
+    row.appendChild(ch);
+    row.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${qk}` }));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+function onWrMCQClick(e) {
+  if (WR.submitted) return;
+  const { examNum, sec, part, num, val } = e.currentTarget.dataset;
+  const k = wrKey(examNum, sec, part, num);
+  const content = $('wrong-answer-content');
+  if (WR.answers[k] === val) {
+    delete WR.answers[k];
+    content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.remove('selected'));
+  } else {
+    WR.answers[k] = val;
+    content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
+  updateWrongUI();
+}
+
+// ── WR MATCHING ──────────────────────────────────────────────
+function renderWrMatching(examNum, secId, part) {
+  const wrap = CE('div');
+  const isP1 = (part.id === 'p1'), isLs2 = (part.id === 'ls2');
+  const opts = part.options || [], questions = part.questions || [];
+
+  if (isLs2) {
+    const inst = part.instruction || '';
+    const mTitle = inst.match(/Match (.+?) with (?:their )?(.+?)\.?$/i);
+    const table = CE('div', { className: 'ls2-table' });
+    const leftCol = CE('div', { className: 'ls2-col ls2-col--left' });
+    leftCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: mTitle ? mTitle[1].trim() : 'Câu hỏi' }));
+    questions.forEach(item => {
+      const k = wrKey(examNum, secId, part.id, item.num);
+      const cell = CE('div', { className: 'ls2-cell ls2-cell--with-btns' });
+      const row = CE('div', { className: 'ls2-row' });
+      row.innerHTML = `<span class="ls2-q-num">${item.num}.</span><span class="ls2-q-text">${esc(item.text||'')}</span>`;
+      cell.appendChild(row);
+      const btnGrid = CE('div', { className: 'ls2-btn-grid' });
+      opts.forEach(o => {
+        const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
+        btn.dataset.examNum = examNum; btn.dataset.sec = secId; btn.dataset.part = part.id; btn.dataset.num = item.num; btn.dataset.val = o.id;
+        btn.addEventListener('click', onWrMatchBtnClick);
+        btnGrid.appendChild(btn);
+      });
+      cell.appendChild(btnGrid);
+      cell.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
+      leftCol.appendChild(cell);
+    });
+    const rightCol = CE('div', { className: 'ls2-col ls2-col--right' });
+    rightCol.appendChild(CE('div', { className: 'ls2-col-hdr', textContent: mTitle ? mTitle[2].trim() : 'Đáp án' }));
+    opts.forEach(o => { const item = CE('div', { className: 'ls2-opt-item' }); item.innerHTML = `<span class="match-opt-letter">${o.id}</span><span class="ls2-opt-text">${esc(o.text)}</span>`; rightCol.appendChild(item); });
+    table.appendChild(leftCol); table.appendChild(rightCol);
+    wrap.appendChild(table); return wrap;
+  }
+
+  if (isP1 && opts.length) {
+    const optList = CE('div', { className: 'match-opt-list match-opt-list--letters' });
+    opts.forEach(o => { const item = CE('div', { className: 'match-opt-item' }); item.innerHTML = `<span class="match-opt-letter">${o.id}</span>`; optList.appendChild(item); });
+    wrap.appendChild(optList);
+  }
+  if (isP1) {
+    questions.forEach(item => {
+      const k = wrKey(examNum, secId, part.id, item.num);
+      const div = CE('div', { className: 'match-q match-q--btn' });
+      div.appendChild(CE('span', { className: 'match-q-num', textContent: `${item.num}.` }));
+      const btnRow = CE('div', { className: 'match-btn-row' });
+      opts.forEach(o => {
+        const btn = CE('button', { className: 'match-lbtn', textContent: o.id });
+        btn.dataset.examNum = examNum; btn.dataset.sec = secId; btn.dataset.part = part.id; btn.dataset.num = item.num; btn.dataset.val = o.id;
+        btn.addEventListener('click', onWrMatchBtnClick);
+        btnRow.appendChild(btn);
+      });
+      div.appendChild(btnRow);
+      div.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
+      wrap.appendChild(div);
+    });
+    return wrap;
+  }
+
+  // Default select
+  const optsHtml = ['<option value="">-- Chọn --</option>', ...(opts.map(o=>`<option value="${o.id}">${o.id} – ${esc(o.text)}</option>`))].join('');
+  questions.forEach(item => {
+    const k = wrKey(examNum, secId, part.id, item.num);
+    const div = CE('div', { className: 'match-q' });
+    div.appendChild(Object.assign(CE('div', { className: 'match-txt' }), { innerHTML: `<span class="q-num">${item.num}.</span> ${esc(item.text||'')}` }));
+    const sel = CE('select', { className: 'match-sel', id: `wrsel_${k}`, innerHTML: optsHtml });
+    sel.dataset.examNum = examNum; sel.dataset.sec = secId; sel.dataset.part = part.id; sel.dataset.num = item.num;
+    sel.addEventListener('change', onWrMatchChange);
+    div.appendChild(sel);
+    div.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
+    wrap.appendChild(div);
+  });
+  return wrap;
+}
+function onWrMatchBtnClick(e) {
+  if (WR.submitted) return;
+  const { examNum, sec, part, num, val } = e.currentTarget.dataset;
+  const k = wrKey(examNum, sec, part, num);
+  const content = $('wrong-answer-content');
+  if (WR.answers[k] === val) {
+    delete WR.answers[k];
+    content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.remove('selected'));
+  } else {
+    WR.answers[k] = val;
+    content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+  }
+  updateWrongUI();
+}
+function onWrMatchChange(e) {
+  if (WR.submitted) return;
+  const { examNum, sec, part, num } = e.target.dataset;
+  WR.answers[wrKey(examNum, sec, part, num)] = e.target.value;
+  updateWrongUI();
+}
+
+// ── WR WORD / TEXT FILL ──────────────────────────────────────
+function renderWrWordFill(examNum, secId, part) {
+  const wrap = CE('div');
+  const questions = part.questions || [];
+  if (part.groups && part.groups.length) {
+    part.groups.forEach(grp => {
+      const grpNums = new Set(grp.nums);
+      const grpQs = questions.filter(q => grpNums.has(q.num));
+      if (!grpQs.length) return;
+      const grpWrap = CE('div', { className: 'fill-group' });
+      if (grp.imgSrc) grpWrap.appendChild(makePartImgEl(grp.imgSrc, `Đề ${examNum}`));
+      grpQs.forEach(q => grpWrap.appendChild(buildWrFillRow(examNum, secId, part, q)));
+      wrap.appendChild(grpWrap);
+    });
+  } else {
+    questions.forEach(q => wrap.appendChild(buildWrFillRow(examNum, secId, part, q)));
+  }
+  return wrap;
+}
+function renderWrFormFill(examNum, secId, part) {
+  const wrap = CE('div');
+  const grp = CE('div', { className: 'fill-group' });
+  if (part.imgSrc) grp.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+  (part.questions || []).forEach(q => {
+    const k = wrKey(examNum, secId, part.id, q.num);
+    const row = CE('div', { className: 'fill-row form-fill-row', id: `wrrow_${k}` });
+    const lbl = CE('div', { className: 'form-fill-label' });
+    lbl.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.label||'')}`;
+    row.appendChild(lbl);
+    const fw = CE('div', { className: 'fill-wrap' });
+    if (q.prefix) fw.appendChild(CE('span', { className: 'fill-pre', textContent: q.prefix }));
+    const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: '...', id: `wrinp_${k}`, autocomplete: 'off' });
+    inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
+    inp.addEventListener('input', onWrFillInput);
+    fw.appendChild(inp);
+    if (q.suffix) fw.appendChild(CE('span', { className: 'fill-suf', textContent: q.suffix }));
+    row.appendChild(fw);
+    row.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
+    grp.appendChild(row);
+  });
+  wrap.appendChild(grp);
+  return wrap;
+}
+function buildWrFillRow(examNum, secId, part, q) {
+  const k = wrKey(examNum, secId, part.id, q.num);
+  const row = CE('div', { className: 'fill-row', id: `wrrow_${k}` });
+  const hasStem = q.stem && !q.stem.match(/^\(Xem/);
+  if (hasStem) {
+    const stem = CE('div', { className: 'q-stem' });
+    stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}${q.hint?`<span class="fill-hint"> (${esc(q.hint)})</span>`:''}`;
+    row.appendChild(stem);
+  }
+  const inpRow = CE('div', { className: 'fill-inp-row' });
+  inpRow.appendChild(CE('span', { className: 'fill-num-badge', textContent: `${q.num}.` }));
+  const inp = CE('input', { className: 'fill-inp', type: 'text', placeholder: 'Nhập từ...', id: `wrinp_${k}`, autocomplete: 'off' });
+  inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
+  inp.addEventListener('input', onWrFillInput);
+  inpRow.appendChild(inp);
+  row.appendChild(inpRow);
+  row.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
+  return row;
+}
+function onWrFillInput(e) {
+  const { examNum, sec, part, num } = e.target.dataset;
+  WR.answers[wrKey(examNum, sec, part, num)] = e.target.value.trim();
+  updateWrongUI();
+}
+
+// ── WR RESTORE ───────────────────────────────────────────────
+function restoreWrAnswers() {
+  const content = $('wrong-answer-content');
+  Object.entries(WR.answers).forEach(([k, val]) => {
+    if (!val) return;
+    // k = wr_eN_secId_partId_num
+    const m = k.match(/^wr_e(\d+)_(.+)_([^_]+)_(\d+)$/);
+    if (!m) return;
+    const [, examNum, secId, partId, num] = m;
+    const btn = content.querySelector(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
+    if (btn) { content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`).forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); return; }
+    const lbtn = content.querySelector(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"][data-val="${val}"]`);
+    if (lbtn) { content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${partId}"][data-num="${num}"]`).forEach(b=>b.classList.remove('selected')); lbtn.classList.add('selected'); return; }
+    const sel = $(`wrsel_${k}`);
+    if (sel) { sel.value = val; return; }
+    const inp = $(`wrinp_${k}`);
+    if (inp) inp.value = val;
+  });
+}
+
+// ── WR COUNT / UI ────────────────────────────────────────────
+function countWrAnswers() {
+  let total = 0, done = 0;
+  WR.items.forEach(({ part }) => { (part.questions||[]).forEach(q => { total++; }); });
+  Object.values(WR.answers).forEach(v => { if (v) done++; });
+  // recount properly
+  done = 0; total = 0;
+  WR.items.forEach(({ examNum, secId, part }) => {
+    (part.questions||[]).forEach(q => {
+      total++;
+      if (WR.answers[wrKey(examNum, secId, part.id, q.num)]) done++;
+    });
+  });
+  return { total, done };
+}
+function updateWrongUI() {
+  const { total, done } = countWrAnswers();
+  $('wrong-answer-status').textContent = `${done}/${total}`;
+  $('wrong-answer-status').style.color = done === total ? '#22c55e' : '#94a3b8';
+  $('wrong-unanswered-count').textContent = total - done;
+}
+
+// ── WR MARK ──────────────────────────────────────────────────
+function markWrAnswers() {
+  const content = $('wrong-answer-content');
+  content.querySelectorAll('.cbtn, .match-lbtn, .match-sel, input').forEach(el => { el.disabled = true; });
+
+  WR.items.forEach(({ examNum, secId, part }) => {
+    if (part.type === 'matching') {
+      const correctMap = part.answers || {};
+      const isBtn = (part.id === 'p1' || part.id === 'ls2');
+      (part.questions||[]).forEach(item => {
+        const k = wrKey(examNum, secId, part.id, item.num);
+        const correct = String(correctMap[item.num]||'');
+        const user = WR.answers[k]||'';
+        const fb = $(`wrfb_${k}`);
+        if (!correct) return;
+        if (isBtn) {
+          content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${item.num}"]`).forEach(b => {
+            if (b.dataset.val === correct) b.classList.add('lbtn-correct');
+            else if (b.dataset.val === user && user !== correct) b.classList.add('lbtn-wrong');
+          });
+        } else {
+          const sel = $(`wrsel_${k}`);
+          if (sel) sel.classList.add(user === correct ? 'correct-fill' : 'wrong-fill');
+        }
+        if (fb) { fb.className = 'q-fb '+(user===correct?'ok':'bad'); fb.textContent = user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
+      });
+      return;
+    }
+    (part.questions||[]).forEach(q => {
+      const k = wrKey(examNum, secId, part.id, q.num);
+      const fb = $(`wrfb_${k}`);
+      if (part.type === 'mcq') {
+        const correct = (q.ans||'').toUpperCase().trim();
+        const user = (WR.answers[k]||'').toUpperCase().trim();
+        content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${q.num}"]`).forEach(btn => {
+          if (btn.dataset.val===correct && correct) btn.classList.add('correct');
+          if (btn.dataset.val===user && user!==correct) btn.classList.add('wrong-sel');
+        });
+        if (fb && correct) { fb.className='q-fb '+(user===correct?'ok':'bad'); fb.textContent=user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
+      } else {
+        const inp = $(`wrinp_${k}`);
+        const userLow = (WR.answers[k]||'').toLowerCase().trim();
+        const accepted = Array.isArray(q.ans)?q.ans.map(a=>a.toLowerCase().trim()):[(q.ans||'').toLowerCase().trim()];
+        if (q.alts) [].concat(q.alts).forEach(a=>accepted.push(a.toLowerCase().trim()));
+        const isOk = userLow!==''&&accepted.some(a=>a&&userLow===a);
+        const displayAns = Array.isArray(q.ans)?q.ans.join(' / '):q.ans;
+        const hasAns = Array.isArray(q.ans)?q.ans.length>0:!!q.ans;
+        if (inp && hasAns) inp.classList.add(isOk?'correct-fill':'wrong-fill');
+        if (fb && hasAns) { fb.className='q-fb '+(isOk?'ok':'bad'); fb.textContent=isOk?'✓ Đúng':`✗ Đáp án: ${displayAns}`; }
+      }
+    });
+  });
+}
+
+// ── WR RESULTS ───────────────────────────────────────────────
+function showWrResults() {
+  let correct=0, wrong=0, skip=0;
+  WR.items.forEach(({ examNum, secId, part }) => {
+    if (part.type==='matching') {
+      const correctMap = part.answers||{};
+      (part.questions||[]).forEach(item => {
+        const ans = String(correctMap[item.num]||'').trim();
+        const user = (WR.answers[wrKey(examNum,secId,part.id,item.num)]||'').trim();
+        if (!ans) return;
+        if (!user) skip++; else if (user===ans) correct++; else wrong++;
+      });
+      return;
+    }
+    (part.questions||[]).forEach(q => {
+      const k = wrKey(examNum,secId,part.id,q.num);
+      const user = (WR.answers[k]||'').toLowerCase().trim();
+      const accepted = Array.isArray(q.ans)?q.ans.map(a=>a.toLowerCase().trim()):[(q.ans||'').toLowerCase().trim()];
+      if (q.alts) [].concat(q.alts).forEach(a=>accepted.push(a.toLowerCase().trim()));
+      const hasAns = accepted.some(a=>a.length>0);
+      if (!hasAns) return;
+      if (!user) skip++; else if (accepted.some(a=>a&&user===a)) correct++; else wrong++;
+    });
+  });
+  const total=correct+wrong+skip, pct=total?Math.round(correct/total*100):0;
+  $('wrong-res-correct').textContent=correct;
+  $('wrong-res-wrong').textContent=wrong;
+  $('wrong-res-skip').textContent=skip;
+  $('wrong-result-pct').textContent=pct+'%';
+  const arc=$('wrong-result-arc');
+  if (arc) { setTimeout(()=>{ arc.style.strokeDashoffset=314-(314*pct/100); },80); arc.style.stroke=pct>=70?'#22c55e':pct>=40?'#f59e0b':'#ef4444'; }
+  $('wrong-result-panel').classList.remove('hidden');
+  $('wrong-answer-content').scrollTop=0;
+}
+
+function resetWrExam() {
+  WR.answers={}; WR.submitted=false;
+  $('wrong-btn-submit').style.display='';
+  $('wrong-result-panel').classList.add('hidden');
+  renderWrongAnswerSheet();
+  updateWrongUI();
+}
+
+// ── WR EVENT LISTENERS ───────────────────────────────────────
+$('btn-wrong-review').addEventListener('click', openWrongReview);
+$('wrong-btn-back').addEventListener('click', closeWrongSelector);
+$('wrong-screen').addEventListener('click', e => { if (e.target===$('wrong-screen')) closeWrongSelector(); });
+
+$('wrong-exam-back').addEventListener('click', () => {
+  stopActiveAudio();
+  $('wrong-exam-screen').classList.add('hidden');
+  $('wrong-screen').classList.remove('hidden');
+  renderWrongSelector();
+});
+$('wrong-exam-screen').addEventListener('click', e => {
+  if (e.target===$('wrong-exam-screen')) { stopActiveAudio(); $('wrong-exam-screen').classList.add('hidden'); $('wrong-screen').classList.remove('hidden'); renderWrongSelector(); }
+});
+
+$('wrong-btn-submit').addEventListener('click', () => $('wrong-modal-submit').classList.remove('hidden'));
+$('wrong-modal-cancel').addEventListener('click', () => $('wrong-modal-submit').classList.add('hidden'));
+$('wrong-modal-confirm').addEventListener('click', () => {
+  $('wrong-modal-submit').classList.add('hidden');
+  WR.submitted=true; $('wrong-btn-submit').style.display='none';
+  markWrAnswers(); showWrResults();
+});
+$('wrong-modal-submit').addEventListener('click', e => { if (e.target===$('wrong-modal-submit')) $('wrong-modal-submit').classList.add('hidden'); });
+
+$('wrong-btn-reset').addEventListener('click', () => { if (confirm('Làm lại từ đầu? Toàn bộ đáp án sẽ bị xoá.')) resetWrExam(); });
+$('wrong-btn-review').addEventListener('click', () => { $('wrong-result-panel').classList.add('hidden'); $('wrong-answer-content').scrollTop=0; });
+$('wrong-btn-retry').addEventListener('click', resetWrExam);
+
 // ── INIT ──────────────────────────────────────────────────────
 buildHome();
+updateWrongBannerSub();
 
 // Start exam modal
 $('modal-start-confirm').addEventListener('click', () => {
@@ -1868,6 +2656,7 @@ $('modal-clear-confirm').addEventListener('click', () => {
   }
   $('modal-clear').classList.add('hidden');
   buildHome();
+  updateWrongBannerSub();
 });
 $('modal-clear').addEventListener('click', (e) => {
   if (e.target === $('modal-clear')) $('modal-clear').classList.add('hidden');

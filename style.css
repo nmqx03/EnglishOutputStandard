@@ -987,61 +987,64 @@ body {
 ══════════════════════════════════════════════════════════ */
 
 .prac-selector {
-  padding: 4px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .prac-section-tabs {
   display: flex;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .prac-tab {
   flex: 1;
-  padding: 11px 10px;
+  padding: 13px 10px;
   border: 1.5px solid var(--rim2);
-  border-radius: 14px;
-  background: var(--bg2);
+  border-radius: 16px;
+  background: var(--card);
   font-family: var(--font);
   font-size: 14px;
   font-weight: 700;
   color: var(--t2);
   cursor: pointer;
   transition: all .15s ease;
+  box-shadow: 0 2px 8px rgba(37,99,235,.05);
 }
 .prac-tab.active {
   background: var(--blue);
   border-color: var(--blue);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(37,99,235,.28);
+  box-shadow: 0 4px 16px rgba(37,99,235,.3);
 }
 .prac-tab:not(.active):hover {
-  border-color: var(--blue3);
+  border-color: rgba(37,99,235,.3);
   color: var(--blue);
   background: var(--blue-soft);
 }
 
 .prac-group-label {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: var(--t3);
   margin-bottom: 12px;
   text-transform: uppercase;
-  letter-spacing: .10em;
+  letter-spacing: .12em;
 }
 
 .prac-group-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-  gap: 9px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
 .prac-group-btn {
-  padding: 14px 8px;
-  border: 1.5px solid var(--rim);
-  border-radius: 14px;
-  background: var(--bg2);
+  padding: 18px 8px;
+  border: 1.5px solid rgba(37,99,235,.12);
+  border-radius: 16px;
+  background: var(--card);
   font-family: var(--font);
   font-size: 13px;
   font-weight: 700;
@@ -1050,14 +1053,14 @@ body {
   transition: all .15s ease;
   text-align: center;
   line-height: 1.3;
-  box-shadow: 0 1px 4px rgba(37,99,235,.05);
+  box-shadow: 0 2px 8px rgba(37,99,235,.06);
 }
 .prac-group-btn .prac-group-range {
   display: block;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--t1);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .prac-group-btn .prac-group-count {
   display: block;
@@ -1068,16 +1071,17 @@ body {
 .prac-group-btn.selected {
   background: var(--blue);
   border-color: var(--blue);
-  box-shadow: 0 4px 14px rgba(37,99,235,.28);
+  box-shadow: 0 6px 18px rgba(37,99,235,.3);
 }
 .prac-group-btn.selected .prac-group-range,
 .prac-group-btn.selected .prac-group-count { color: #fff; }
 .prac-group-btn:not(.selected):hover {
-  border-color: var(--blue-rim);
+  border-color: rgba(37,99,235,.3);
   background: var(--blue-soft);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37,99,235,.10);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37,99,235,.12);
 }
+.prac-group-btn:not(.selected):active { transform: scale(.97); }
 
 .prac-start-btn {
   width: 100%;
@@ -1085,7 +1089,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px;
+  padding: 15px;
   background: var(--blue);
   color: #fff;
   border: none;
@@ -1096,7 +1100,7 @@ body {
   cursor: pointer;
   transition: all .15s ease;
   box-shadow: 0 4px 16px rgba(37,99,235,.3);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .prac-start-btn:hover  { background: #1d4ed8; box-shadow: 0 6px 22px rgba(37,99,235,.4); transform: translateY(-1px); }
 .prac-start-btn:active { transform: scale(.98); }
@@ -1125,4 +1129,260 @@ body {
   border: none;
   border-top: 2px dashed var(--rim);
   margin: 18px 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   WRONG REVIEW BANNER variant
+══════════════════════════════════════════════════════════ */
+
+.prac-mode-banner-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prac-mode-banner--wrong {
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(239,68,68,.2);
+}
+.prac-mode-banner--wrong:hover {
+  border-color: rgba(239,68,68,.45);
+  box-shadow: 0 8px 28px rgba(239,68,68,.12);
+}
+
+.prac-mode-icon-wrap--red {
+  background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  box-shadow: 0 4px 12px rgba(220,38,38,.28);
+}
+
+/* ══════════════════════════════════════════════════════════
+   WRONG REVIEW SELECTOR SCREEN
+══════════════════════════════════════════════════════════ */
+
+.wr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  gap: 14px;
+  color: var(--t3);
+  text-align: center;
+}
+.wr-empty-icon { font-size: 48px; line-height: 1; }
+.wr-empty-title { font-size: 16px; font-weight: 800; color: var(--t2); }
+.wr-empty-sub   { font-size: 13px; font-weight: 500; }
+
+/* Filter bar */
+.wr-filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.wr-filter-btn {
+  padding: 6px 14px;
+  border: 1.5px solid var(--rim2);
+  border-radius: 100px;
+  background: var(--bg2);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all .14s ease;
+}
+.wr-filter-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.wr-filter-btn:not(.active):hover {
+  border-color: var(--blue3);
+  color: var(--blue);
+}
+
+/* Summary header */
+.wr-summary-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.wr-summary-title {
+  font-size: 13px; font-weight: 800;
+  color: var(--t2); text-transform: uppercase; letter-spacing: .08em;
+}
+.wr-summary-count {
+  font-size: 12px; font-weight: 700;
+  color: var(--bad);
+  background: rgba(220,38,38,.08);
+  border: 1px solid rgba(220,38,38,.18);
+  padding: 3px 10px; border-radius: 100px;
+}
+
+/* Exam cards in wrong review */
+.wr-exam-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+
+.wr-exam-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1.5px solid var(--rim);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all .14s ease;
+  box-shadow: 0 1px 6px rgba(37,99,235,.05);
+}
+.wr-exam-card:hover {
+  border-color: rgba(220,38,38,.35);
+  box-shadow: 0 4px 16px rgba(220,38,38,.10);
+  transform: translateY(-1px);
+}
+
+.wr-exam-num {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(220,38,38,.08);
+  border: 1.5px solid rgba(220,38,38,.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900;
+  color: var(--bad);
+  flex-shrink: 0;
+}
+
+.wr-exam-info { flex: 1; min-width: 0; }
+.wr-exam-name { font-size: 14px; font-weight: 800; color: var(--t1); }
+.wr-exam-detail {
+  font-size: 11.5px; font-weight: 600; color: var(--t3);
+  margin-top: 2px;
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.wr-exam-detail-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(220,38,38,.07);
+  border: 1px solid rgba(220,38,38,.14);
+  color: var(--bad);
+  padding: 2px 8px; border-radius: 100px;
+  font-size: 11px; font-weight: 700;
+}
+.wr-exam-arrow { color: var(--t3); flex-shrink: 0; font-size: 16px; }
+
+/* Start all button */
+.wr-start-all-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .15s ease;
+  box-shadow: 0 4px 16px rgba(220,38,38,.3);
+  margin-top: 4px;
+  position: sticky;
+  bottom: 0;
+}
+.wr-start-all-btn:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 22px rgba(220,38,38,.4); }
+.wr-start-all-btn:active { transform: scale(.98); }
+
+/* ── WRONG EXAM SCREEN source badge variant ── */
+.prac-exam-source--wrong {
+  background: rgba(220,38,38,.07);
+  border-color: rgba(220,38,38,.18);
+  color: var(--bad);
+}
+
+/* Add wrong-exam-screen to overlay group */
+#wrong-screen,
+#wrong-exam-screen {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(30,58,95,.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 16px;
+  animation: overlayIn .22s var(--ease);
+}
+#wrong-screen.hidden,
+#wrong-exam-screen.hidden { display: none !important; }
+
+
+/* ══════════════════════════════════════════════════════════
+   WRONG REVIEW — chip selector layout
+══════════════════════════════════════════════════════════ */
+
+/* Exam heading row */
+.wr-exam-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 6px;
+  margin-top: 14px;
+  border-bottom: 1.5px solid var(--rim);
+}
+.wr-exam-hdr:first-of-type { margin-top: 4px; }
+
+.wr-exam-hdr-num {
+  font-size: 13px; font-weight: 900;
+  color: var(--t1);
+}
+.wr-exam-hdr-count {
+  font-size: 11px; font-weight: 700;
+  color: var(--bad);
+  background: rgba(220,38,38,.08);
+  border: 1px solid rgba(220,38,38,.15);
+  padding: 2px 9px; border-radius: 100px;
+}
+
+/* Chip row for groups */
+.wr-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0 4px;
+}
+
+.wr-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 10px;
+  border: 1.5px solid var(--rim2);
+  border-radius: 100px;
+  background: var(--card);
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all .14s ease;
+  box-shadow: 0 1px 4px rgba(37,99,235,.05);
+}
+.wr-chip:hover {
+  border-color: rgba(220,38,38,.4);
+  background: rgba(220,38,38,.04);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220,38,38,.12);
+}
+.wr-chip:active { transform: scale(.97); }
+
+.wr-chip-sec  { font-size: 13px; line-height: 1; }
+.wr-chip-range {
+  font-size: 12.5px; font-weight: 800;
+  color: var(--t1);
+}
+.wr-chip-count {
+  font-size: 11px; font-weight: 800;
+  color: var(--bad);
+  background: rgba(220,38,38,.09);
+  border: 1px solid rgba(220,38,38,.15);
+  padding: 1px 7px; border-radius: 100px;
 }

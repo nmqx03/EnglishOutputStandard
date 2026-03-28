@@ -2420,27 +2420,27 @@ const QUESTIONS = {
             "questions": [
               {
                 "num": 21,
-                "label": "Subject",
+                "label": "",
                 "ans": "clothes"
               },
               {
                 "num": 22,
-                "label": "Language",
+                "label": "",
                 "ans": "Spanish"
               },
               {
                 "num": 23,
-                "label": "Month",
+                "label": "",
                 "ans": "December"
               },
               {
                 "num": 24,
-                "label": "Price",
+                "label": "",
                 "ans": "3.80"
               },
               {
                 "num": 25,
-                "label": "Number",
+                "label": "",
                 "ans": "557642"
               }
             ]
@@ -4735,7 +4735,7 @@ const QUESTIONS = {
             "id": "ls3",
             "type": "mcq",
             "instruction": "Questions 11-15: Choose A, B or C.",
-            "audioSrc": "audio/5.3",
+            "audioSrc": "audio/6.3",
             "imgSrc": "",
             "questions": [
               {
