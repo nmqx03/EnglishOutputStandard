@@ -1221,7 +1221,7 @@ const QUESTIONS = {
             "questions": [
               {
                 "num": 41,
-                "stem": "...on a train __41__ week.",
+                "stem": "",
                 "ans": [
                   "last",
                   "this"
@@ -1229,21 +1229,21 @@ const QUESTIONS = {
               },
               {
                 "num": 42,
-                "stem": "...train to Cambridge __42__ 10th May.",
+                "stem": "",
                 "ans": [
                   "on"
                 ]
               },
               {
                 "num": 43,
-                "stem": "It is __43__ large blue bag.",
+                "stem": "",
                 "ans": [
                   "a"
                 ]
               },
               {
                 "num": 44,
-                "stem": "...my name __44__ written on the outside.",
+                "stem": "",
                 "ans": [
                   "is",
                   "was"
@@ -1251,35 +1251,35 @@ const QUESTIONS = {
               },
               {
                 "num": 45,
-                "stem": "__45__ you found this bag?",
+                "stem": "",
                 "ans": [
                   "have"
                 ]
               },
               {
                 "num": 46,
-                "stem": "I __46__ pleased to tell __47__ that we have your bag.",
+                "stem": "",
                 "ans": [
                   "am"
                 ]
               },
               {
                 "num": 47,
-                "stem": "...tell __47__ that we have your bag.",
+                "stem": "",
                 "ans": [
                   "you"
                 ]
               },
               {
                 "num": 48,
-                "stem": "If you come __48__ this office...",
+                "stem": "",
                 "ans": [
                   "to"
                 ]
               },
               {
                 "num": 49,
-                "stem": "...we __49__ give it to you.",
+                "stem": "",
                 "ans": [
                   "will",
                   "can",
@@ -1288,7 +1288,7 @@ const QUESTIONS = {
               },
               {
                 "num": 50,
-                "stem": "The office __50__ at 9 a.m.",
+                "stem": "",
                 "ans": [
                   "opens"
                 ]
@@ -4582,7 +4582,8 @@ const QUESTIONS = {
                 "alts": [
                   "30.00",
                   "thirty pounds",
-                  "thirty"
+                  "thirty",
+                  "30"
                 ]
               }
             ],

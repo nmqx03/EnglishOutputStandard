@@ -965,6 +965,10 @@ body {
   font-size: 22px; flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(37,99,235,.28);
 }
+.prac-mode-icon-wrap--red {
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  box-shadow: 0 4px 12px rgba(37,99,235,.28);
+}
 
 .prac-mode-text  { flex: 1; min-width: 0; }
 .prac-mode-title {
@@ -1144,16 +1148,16 @@ body {
 
 .prac-mode-banner--wrong {
   background: rgba(255,255,255,0.72);
-  border-color: rgba(239,68,68,.2);
+  border-color: rgba(37,99,235,.18);
 }
 .prac-mode-banner--wrong:hover {
-  border-color: rgba(239,68,68,.45);
-  box-shadow: 0 8px 28px rgba(239,68,68,.12);
+  border-color: rgba(37,99,235,.38);
+  box-shadow: 0 8px 28px rgba(37,99,235,.18);
 }
 
 .prac-mode-icon-wrap--red {
-  background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
-  box-shadow: 0 4px 12px rgba(220,38,38,.28);
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  box-shadow: 0 4px 12px rgba(37,99,235,.28);
 }
 
 /* ══════════════════════════════════════════════════════════

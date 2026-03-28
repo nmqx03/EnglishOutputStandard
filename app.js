@@ -1967,12 +1967,8 @@ function closeWrongSelector() {
 }
 
 function updateWrongBannerSub() {
-  const rows = buildWrongGroupSummary();
-  const totalQ = rows.reduce((a, r) => a + r.wrongCount, 0);
   const sub = $('wrong-review-sub');
-  if (sub) sub.textContent = totalQ > 0
-    ? `${totalQ} câu sai · ${rows.length} nhóm cần ôn`
-    : 'Tổng hợp câu sai từ tất cả đề đã nộp';
+  if (sub) sub.textContent = 'Luyện lại những câu sai';
 }
 
 function renderWrongSelector() {
@@ -2066,7 +2062,8 @@ function renderWrongSelector() {
 }
 
 // ── Build wrong-questions item list ──────────────────────────
-// examNumFilter: null = all exams
+// Nếu nhóm có ít nhất 1 câu sai → load TOÀN BỘ nhóm đó để làm lại
+// examNumFilter: null = all exams, or specific examNum
 // sectionFilter: 'doc'|'nghe'|null = all
 // groupFilter: { from, to } | null = all groups
 function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
@@ -2074,6 +2071,28 @@ function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
   const exams = examNumFilter
     ? [examNumFilter]
     : Array.from({ length: 20 }, (_, i) => i + 1);
+
+  // Kiểm tra 1 câu có bị sai không (đã làm nhưng sai, không tính bỏ qua)
+  function isAnsweredWrong(part, q, secId, partId, answers) {
+    if (part.type === 'matching') {
+      const correctMap = part.answers || {};
+      const ans = String(correctMap[q.num] || '').trim();
+      if (!ans) return false;
+      const user = (answers[key(secId, partId, q.num)] || '').trim();
+      if (!user) return false;
+      return user !== ans;
+    }
+    const k = key(secId, partId, q.num);
+    const user = (answers[k] || '').toLowerCase().trim();
+    if (!user) return false;
+    const accepted = Array.isArray(q.ans)
+      ? q.ans.map(a => a.toLowerCase().trim())
+      : [(q.ans || '').toLowerCase().trim()];
+    if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
+    const hasAns = accepted.some(a => a.length > 0);
+    if (!hasAns) return false;
+    return !accepted.some(a => a && user === a);
+  }
 
   exams.forEach(examNum => {
     const saved = loadSaved(examNum);
@@ -2084,61 +2103,55 @@ function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
 
     data.sections.forEach(sec => {
       const isNghe = isNgheSec(sec.id);
-      // section filter
       if (sectionFilter === 'doc'  && isNghe)  return;
       if (sectionFilter === 'nghe' && !isNghe) return;
-      // WR.filter also applies when no sectionFilter
       if (!sectionFilter && WR.filter === 'doc'  && isNghe)  return;
       if (!sectionFilter && WR.filter === 'nghe' && !isNghe) return;
 
       (sec.parts || []).forEach(part => {
         if (part.type === 'writing') return;
 
-        let wrongQs = [];
+        // Xác định nhóm cần kiểm tra
+        const section = isNghe ? 'nghe' : 'doc';
+        const groupsToCheck = groupFilter
+          ? [groupFilter]
+          : (PRAC_GROUPS[section] || []);
 
-        if (part.type === 'matching') {
-          const correctMap = part.answers || {};
-          wrongQs = (part.questions || []).filter(item => {
-            if (groupFilter && (item.num < groupFilter.from || item.num > groupFilter.to)) return false;
-            const ans = String(correctMap[item.num] || '').trim();
-            if (!ans) return false;
-            const user = (answers[key(sec.id, part.id, item.num)] || '').trim();
-            if (!user) return false; // chưa làm = bỏ qua
-            return user !== ans;
+        groupsToCheck.forEach(group => {
+          // Tất cả câu của part nằm trong phạm vi nhóm này
+          const allQsInGroup = (part.questions || []).filter(q =>
+            q.num >= group.from && q.num <= group.to
+          );
+          if (!allQsInGroup.length) return;
+
+          // Chỉ load nhóm nếu có ít nhất 1 câu đã làm SAI
+          const hasWrong = allQsInGroup.some(q =>
+            isAnsweredWrong(part, q, sec.id, part.id, answers)
+          );
+          if (!hasWrong) return;
+
+          // Load TOÀN BỘ câu trong nhóm (kể cả câu đúng và chưa làm)
+          // Với text_fill/word_fill có sub-groups: giữ sub-group thuộc range này
+          let filteredGroups = undefined;
+          if (part.groups && part.groups.length) {
+            filteredGroups = part.groups
+              .map(grp => {
+                const numsInRange = (grp.nums || []).filter(n =>
+                  n >= group.from && n <= group.to
+                );
+                return numsInRange.length ? { ...grp, nums: numsInRange } : null;
+              })
+              .filter(Boolean);
+          }
+
+          items.push({
+            examNum, secId: sec.id,
+            part: {
+              ...part,
+              questions: allQsInGroup,
+              groups: filteredGroups || undefined,
+            },
           });
-        } else {
-          wrongQs = (part.questions || []).filter(q => {
-            if (groupFilter && (q.num < groupFilter.from || q.num > groupFilter.to)) return false;
-            const k = key(sec.id, part.id, q.num);
-            const user = (answers[k] || '').toLowerCase().trim();
-            if (!user) return false; // chưa làm = bỏ qua
-            const accepted = Array.isArray(q.ans)
-              ? q.ans.map(a => a.toLowerCase().trim())
-              : [(q.ans || '').toLowerCase().trim()];
-            if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
-            const hasAns = accepted.some(a => a.length > 0);
-            if (!hasAns) return false;
-            return !accepted.some(a => a && user === a);
-          });
-        }
-
-        if (!wrongQs.length) return;
-
-        // Filter sub-groups for text_fill/word_fill
-        let filteredGroups = undefined;
-        if (part.groups && part.groups.length) {
-          const wrongNums = new Set(wrongQs.map(q => q.num));
-          filteredGroups = part.groups
-            .map(grp => {
-              const filteredNums = (grp.nums || []).filter(n => wrongNums.has(n));
-              return filteredNums.length ? { ...grp, nums: filteredNums } : null;
-            })
-            .filter(Boolean);
-        }
-
-        items.push({
-          examNum, secId: sec.id,
-          part: { ...part, questions: wrongQs, groups: filteredGroups || undefined },
         });
       });
     });
