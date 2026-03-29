@@ -5928,7 +5928,8 @@ const QUESTIONS = {
                   "6 pounds",
                   "£6",
                   "six pounds",
-                  "six"
+                  "six",
+                  "6.00"
                 ]
               }
             ],
@@ -6438,7 +6439,7 @@ const QUESTIONS = {
                 "num": 38,
                 "stem": "If you eat in a restaurant, this person brings your food to you.",
                 "hint": "w",
-                "ans": "walter"
+                "ans": "waiter"
               },
               {
                 "num": 39,
@@ -6781,7 +6782,7 @@ const QUESTIONS = {
             "questions": [
               {
                 "num": 11,
-                "ans": "B",
+                "ans": "A",
                 "stem": "Each driving lesson costs",
                 "opts": ["£14.", "£40.", "£60."]
               },
@@ -6793,19 +6794,19 @@ const QUESTIONS = {
               },
               {
                 "num": 13,
-                "ans": "B",
+                "ans": "A",
                 "stem": "The teacher's car is",
                 "opts": ["slow.", "old.", "big."]
               },
               {
                 "num": 14,
-                "ans": "A",
+                "ans": "C",
                 "stem": "Peter failed the test because he",
                 "opts": ["drove too fast.", "didn't see a crossing.", "didn't stop at the traffic lights."]
               },
               {
                 "num": 15,
-                "ans": "C",
+                "ans": "A",
                 "stem": "Peter thinks the teacher is too",
                 "opts": ["expensive.", "unfriendly.", "young."]
               }
@@ -8053,7 +8054,7 @@ const QUESTIONS = {
               },
               {
                 "num": 55,
-                "label": "55",
+                "label": "",
                 "prefix": "",
                 "suffix": "",
                 "ans": "money",
@@ -10315,7 +10316,7 @@ const QUESTIONS = {
             "id": "ls3",
             "type": "mcq",
             "instruction": "Questions 11-15: Choose A, B or C.",
-            "audioSrc": "audio/14.3",
+            "audioSrc": "audio/6.3",
             "imgSrc": "",
             "questions": [
               {
