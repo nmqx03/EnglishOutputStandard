@@ -11019,7 +11019,7 @@ const QUESTIONS = {
             "id": "ls3",
             "type": "mcq",
             "instruction": "Questions 11-15: Choose A, B or C.",
-            "audioSrc": "audio/15.3",
+            "audioSrc": "audio/5.3",
             "imgSrc": "",
             "questions": [
               {
@@ -12402,7 +12402,7 @@ const QUESTIONS = {
             "id": "ls3",
             "type": "mcq",
             "instruction": "Questions 11-15: Choose A, B or C.",
-            "audioSrc": "audio/17.3",
+            "audioSrc": "audio/3.3",
             "imgSrc": "",
             "questions": [
               {
