@@ -1842,6 +1842,27 @@ const WR = {
   submitted: false,
 };
 
+const WR_LS_KEY = 'humg_wr_session';
+
+function saveWR() {
+  try {
+    localStorage.setItem(WR_LS_KEY, JSON.stringify({
+      answers: WR.answers,
+      submitted: WR.submitted,
+      filter: WR.filter,
+      source: WR.source,
+    }));
+  } catch(e) {}
+}
+
+function loadWR() {
+  try { return JSON.parse(localStorage.getItem(WR_LS_KEY)); } catch(e) { return null; }
+}
+
+function clearWRSession() {
+  try { localStorage.removeItem(WR_LS_KEY); } catch(e) {}
+}
+
 // ── Helpers ──────────────────────────────────────────────────
 
 function isNgheSec(secId) {
@@ -2169,7 +2190,6 @@ function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
 // groupFilter: { from, to, label }|null
 function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
   WR.source = examNumFilter;
-  WR.answers = {};
   WR.submitted = false;
   WR.items = buildWrongItems(examNumFilter, sectionFilter, groupFilter);
 
@@ -2177,6 +2197,15 @@ function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
     showToast('🎉 Không có câu sai để ôn!');
     return;
   }
+
+  // Restore saved session if exists
+  const savedWR = loadWR();
+  if (savedWR && !savedWR.submitted) {
+    WR.answers = savedWR.answers || {};
+  } else {
+    WR.answers = {};
+  }
+  WR.submitted = (savedWR && savedWR.submitted) || false;
 
   // Build nav title
   const parts = [];
@@ -2186,15 +2215,16 @@ function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
   else if (sectionFilter === 'nghe') parts.push('Phần Nghe');
   if (groupFilter) parts.push(groupFilter.label);
   const totalWrong = WR.items.reduce((a, i) => a + i.part.questions.length, 0);
-  parts.push(`${totalWrong} câu sai`);
+  parts.push(`${totalWrong} câu`);
 
   $('wrong-exam-title').textContent = parts.join(' · ');
   $('wrong-screen').classList.add('hidden');
   $('wrong-exam-screen').classList.remove('hidden');
   $('wrong-result-panel').classList.add('hidden');
-  $('wrong-btn-submit').style.display = '';
+  $('wrong-btn-submit').style.display = WR.submitted ? 'none' : '';
 
   renderWrongAnswerSheet();
+  if (WR.submitted) { markWrAnswers(); showWrResults(); }
   updateWrongUI();
 }
 
@@ -2294,6 +2324,7 @@ function onWrMCQClick(e) {
     WR.answers[k] = val;
     content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.toggle('selected', b.dataset.val === val));
   }
+  saveWR();
   updateWrongUI();
 }
 
@@ -2384,12 +2415,14 @@ function onWrMatchBtnClick(e) {
     WR.answers[k] = val;
     content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`).forEach(b => b.classList.toggle('selected', b.dataset.val === val));
   }
+  saveWR();
   updateWrongUI();
 }
 function onWrMatchChange(e) {
   if (WR.submitted) return;
   const { examNum, sec, part, num } = e.target.dataset;
   WR.answers[wrKey(examNum, sec, part, num)] = e.target.value;
+  saveWR();
   updateWrongUI();
 }
 
@@ -2439,7 +2472,7 @@ function renderWrFormFill(examNum, secId, part) {
 function buildWrFillRow(examNum, secId, part, q) {
   const k = wrKey(examNum, secId, part.id, q.num);
   const row = CE('div', { className: 'fill-row', id: `wrrow_${k}` });
-  const hasStem = q.stem && !q.stem.match(/^\(Xem/);
+  const hasStem = q.stem && !q.stem.match(/^\(Xem/) && !(q.num >= 41 && q.num <= 50);
   if (hasStem) {
     const stem = CE('div', { className: 'q-stem' });
     stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}${q.hint?`<span class="fill-hint"> (${esc(q.hint)})</span>`:''}`;
@@ -2451,6 +2484,20 @@ function buildWrFillRow(examNum, secId, part, q) {
   inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
   inp.addEventListener('input', onWrFillInput);
   inpRow.appendChild(inp);
+  // Q36-40: hiển thị chữ cái đầu + dấu gạch
+  if (q.num >= 36 && q.num <= 40) {
+    const primary = getPrimaryAns(q.ans);
+    if (primary.length > 0) {
+      const first = primary[0].toUpperCase();
+      const rest  = primary.length - 1;
+      const hint  = CE('span', { className: 'fill-letter-hint' });
+      hint.innerHTML =
+        `<span class="fill-first">${first}</span>` +
+        (rest > 0 ? `<span class="fill-blanks">${'_ '.repeat(rest).trim()}</span>` : '') +
+        `<span class="fill-count">(${primary.length} chữ cái)</span>`;
+      inpRow.appendChild(hint);
+    }
+  }
   row.appendChild(inpRow);
   row.appendChild(CE('div', { className: 'q-fb', id: `wrfb_${k}` }));
   return row;
@@ -2458,6 +2505,7 @@ function buildWrFillRow(examNum, secId, part, q) {
 function onWrFillInput(e) {
   const { examNum, sec, part, num } = e.target.dataset;
   WR.answers[wrKey(examNum, sec, part, num)] = e.target.value.trim();
+  saveWR();
   updateWrongUI();
 }
 
@@ -2619,14 +2667,20 @@ $('wrong-btn-submit').addEventListener('click', () => $('wrong-modal-submit').cl
 $('wrong-modal-cancel').addEventListener('click', () => $('wrong-modal-submit').classList.add('hidden'));
 $('wrong-modal-confirm').addEventListener('click', () => {
   $('wrong-modal-submit').classList.add('hidden');
-  WR.submitted=true; $('wrong-btn-submit').style.display='none';
+  WR.submitted = true; $('wrong-btn-submit').style.display = 'none';
+  saveWR();
   markWrAnswers(); showWrResults();
 });
 $('wrong-modal-submit').addEventListener('click', e => { if (e.target===$('wrong-modal-submit')) $('wrong-modal-submit').classList.add('hidden'); });
 
-$('wrong-btn-reset').addEventListener('click', () => { if (confirm('Làm lại từ đầu? Toàn bộ đáp án sẽ bị xoá.')) resetWrExam(); });
-$('wrong-btn-review').addEventListener('click', () => { $('wrong-result-panel').classList.add('hidden'); $('wrong-answer-content').scrollTop=0; });
-$('wrong-btn-retry').addEventListener('click', resetWrExam);
+$('wrong-btn-reset').addEventListener('click', () => {
+  if (confirm('Làm lại từ đầu? Toàn bộ đáp án sẽ bị xoá.')) {
+    clearWRSession();
+    resetWrExam();
+  }
+});
+$('wrong-btn-review').addEventListener('click', () => { $('wrong-result-panel').classList.add('hidden'); $('wrong-answer-content').scrollTop = 0; });
+$('wrong-btn-retry').addEventListener('click', () => { clearWRSession(); resetWrExam(); });
 
 // ── INIT ──────────────────────────────────────────────────────
 buildHome();
