@@ -138,8 +138,8 @@ body {
 }
 .exam-card:active { transform: translateY(-2px) scale(1.00); }
 .exam-card.done { border-color: rgba(22,163,74,.22); }
-.exam-card.in-progress { border-color: rgba(234,179,8,.35); }
-.exam-card.in-progress:hover { border-color: rgba(234,179,8,.6); }
+.exam-card.in-progress { border-color: rgba(124,58,237,.3); }
+.exam-card.in-progress:hover { border-color: rgba(124,58,237,.55); }
 
 .card-in-progress {
   display: inline-flex; align-items: center; gap: 5px;
@@ -177,6 +177,7 @@ body {
 .score-hi  { background: rgba(22,163,74,.10);  color: #15803d; border: 1px solid rgba(22,163,74,.25); }
 .score-mid { background: rgba(217,119,6,.10);  color: #b45309; border: 1px solid rgba(217,119,6,.25); }
 .score-lo  { background: rgba(220,38,38,.09);  color: #b91c1c; border: 1px solid rgba(220,38,38,.2); }
+.score-purple { background: rgba(124,58,237,.09); color: #6d28d9; border: 1px solid rgba(124,58,237,.22); }
 .card-arrow {
   position: absolute; bottom: 14px; right: 16px;
   color: var(--t3); font-size: 16px;

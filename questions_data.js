@@ -13647,7 +13647,7 @@ const QUESTIONS = {
                 "suffix": "",
                 "ans": "2.30pm",
                 "alts": [
-                  "2.30 pm",
+                  "2.30 p.m",
                   "14.30"
                 ]
               }

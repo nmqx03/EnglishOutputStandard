@@ -54,9 +54,19 @@ function buildHome() {
     const card  = CE('div', { className: 'exam-card' + (done ? ' done' : inProgress ? ' in-progress' : '') });
 
     const scoreHtml = done && score
-      ? `<div class="card-score ${score.pct >= 70 ? 'score-hi' : score.pct >= 40 ? 'score-mid' : 'score-lo'}">
-           <span class="score-num">${score.correct}/${score.total}</span>
-           <span class="score-pct">${score.pct}%</span>
+      ? (() => {
+          const wrong = score.wrong ?? (score.total - score.correct);
+          const cls = wrong > 7 ? 'score-lo' : wrong >= 4 ? 'score-mid' : 'score-hi';
+          return `<div class="card-score ${cls}">
+             <span class="score-num">${score.correct}/${score.total}</span>
+             <span class="score-pct">${score.pct}%</span>
+           </div>`;
+        })()
+      : '';
+
+    const inProgressHtml = inProgress
+      ? `<div class="card-score score-purple">
+           <span class="score-num">Đang làm</span>
          </div>`
       : '';
 
@@ -71,12 +81,6 @@ function buildHome() {
         ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}
       </div>`;
     }
-
-    const inProgressHtml = inProgress
-      ? `<div class="card-in-progress">
-           <span class="card-in-progress-dot"></span>Đang làm
-         </div>`
-      : '';
 
     card.innerHTML = `
       <div class="card-top">
