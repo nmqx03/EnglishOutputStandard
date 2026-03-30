@@ -447,7 +447,7 @@ function renderMCQ(secId, part) {
     const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
     const labels = ['A','B','C'];
     (q.opts || []).forEach((opt, idx) => {
-      const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}  ${opt}` });
+      const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}. ${opt}` });
       btn.dataset.sec = secId; btn.dataset.part = part.id;
       btn.dataset.num = q.num; btn.dataset.val = labels[idx];
       btn.addEventListener('click', onMCQClick);
@@ -1389,7 +1389,7 @@ function renderPracMCQ(examNum, secId, part) {
     const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
     const labels = ['A','B','C'];
     (q.opts || []).forEach((opt, idx) => {
-      const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}  ${opt}` });
+      const btn = CE('button', { className: 'cbtn', textContent: `${labels[idx]}. ${opt}` });
       btn.dataset.examNum = examNum;
       btn.dataset.sec = secId; btn.dataset.part = part.id;
       btn.dataset.num = q.num; btn.dataset.val = labels[idx];
@@ -2268,7 +2268,7 @@ function renderWrMCQ(examNum, secId, part) {
     const ch = CE('div', { className: isVertical ? 'choices choices--vertical' : 'choices' });
     ['A','B','C'].forEach((lbl, idx) => {
       if (!(q.opts||[])[idx]) return;
-      const btn = CE('button', { className: 'cbtn', textContent: `${lbl}  ${q.opts[idx]}` });
+      const btn = CE('button', { className: 'cbtn', textContent: `${lbl}. ${q.opts[idx]}` });
       btn.dataset.examNum = examNum; btn.dataset.sec = secId; btn.dataset.part = part.id; btn.dataset.num = q.num; btn.dataset.val = lbl;
       btn.addEventListener('click', onWrMCQClick);
       ch.appendChild(btn);
