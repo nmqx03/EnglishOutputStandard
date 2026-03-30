@@ -1849,8 +1849,7 @@ function isNgheSec(secId) {
   return s.includes('ls') || s.includes('listen') || s.includes('nghe');
 }
 
-// Return list of wrong question numbers from a saved exam
-// Only counts questions that were ANSWERED INCORRECTLY (not skipped)
+// Return list of questions needing review: answered WRONG or LEFT BLANK
 function getWrongItems(examNum, filter) {
   const saved = loadSaved(examNum);
   if (!saved || !saved.submitted) return [];
@@ -1870,12 +1869,11 @@ function getWrongItems(examNum, filter) {
       if (part.type === 'matching') {
         const correctMap = part.answers || {};
         (part.questions || []).forEach(item => {
-          const k = key(sec.id, part.id, item.num);
           const ans = String(correctMap[item.num] || '').trim();
           if (!ans) return;
-          const user = (answers[k] || '').trim();
-          if (!user) return; // skip = bỏ qua, không tính sai
-          if (user !== ans) wrongs.push({ examNum, secId: sec.id, partId: part.id, num: item.num });
+          const user = (answers[key(sec.id, part.id, item.num)] || '').trim();
+          // bỏ trống hoặc sai → cần ôn
+          if (!user || user !== ans) wrongs.push({ examNum, secId: sec.id, partId: part.id, num: item.num });
         });
         return;
       }
@@ -1883,12 +1881,12 @@ function getWrongItems(examNum, filter) {
       (part.questions || []).forEach(q => {
         const k = key(sec.id, part.id, q.num);
         const user = (answers[k] || '').toLowerCase().trim();
-        if (!user) return; // chưa làm = bỏ qua
         const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans || '').toLowerCase().trim()];
         if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
         const hasAns = accepted.some(a => a.length > 0);
         if (!hasAns) return;
-        const isOk = accepted.some(a => a && user === a);
+        // bỏ trống hoặc sai → cần ôn
+        const isOk = user && accepted.some(a => a && user === a);
         if (!isOk) wrongs.push({ examNum, secId: sec.id, partId: part.id, num: q.num });
       });
     });
@@ -1927,20 +1925,20 @@ function buildWrongGroupSummary() {
                 const ans = String(correctMap[item.num] || '').trim();
                 if (!ans) return;
                 const user = (answers[key(sec.id, part.id, item.num)] || '').trim();
-                if (!user) return; // chưa làm = bỏ qua
-                if (user !== ans) wrongCount++;
+                // chưa làm (bỏ trống) hoặc sai → cần ôn
+                if (!user || user !== ans) wrongCount++;
               });
             } else {
               (part.questions || []).forEach(q => {
                 if (q.num < group.from || q.num > group.to) return;
                 const k = key(sec.id, part.id, q.num);
                 const user = (answers[k] || '').toLowerCase().trim();
-                if (!user) return; // chưa làm = bỏ qua
                 const accepted = Array.isArray(q.ans) ? q.ans.map(a => a.toLowerCase().trim()) : [(q.ans||'').toLowerCase().trim()];
                 if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
                 const hasAns = accepted.some(a => a.length > 0);
                 if (!hasAns) return;
-                const isOk = accepted.some(a => a && user === a);
+                const isOk = user && accepted.some(a => a && user === a);
+                // chưa làm (bỏ trống) hoặc sai → cần ôn
                 if (!isOk) wrongCount++;
               });
             }
@@ -2077,25 +2075,26 @@ function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
     : Array.from({ length: 20 }, (_, i) => i + 1);
 
   // Kiểm tra 1 câu có bị sai không (đã làm nhưng sai, không tính bỏ qua)
-  function isAnsweredWrong(part, q, secId, partId, answers) {
+  // Kiểm tra câu cần ôn lại: đã làm SAI hoặc BỎ TRỐNG
+  function needsReview(part, q, secId, partId, answers) {
     if (part.type === 'matching') {
       const correctMap = part.answers || {};
       const ans = String(correctMap[q.num] || '').trim();
       if (!ans) return false;
       const user = (answers[key(secId, partId, q.num)] || '').trim();
-      if (!user) return false;
-      return user !== ans;
+      // bỏ trống hoặc sai → cần ôn
+      return !user || user !== ans;
     }
     const k = key(secId, partId, q.num);
     const user = (answers[k] || '').toLowerCase().trim();
-    if (!user) return false;
     const accepted = Array.isArray(q.ans)
       ? q.ans.map(a => a.toLowerCase().trim())
       : [(q.ans || '').toLowerCase().trim()];
     if (q.alts) [].concat(q.alts).forEach(a => accepted.push(a.toLowerCase().trim()));
     const hasAns = accepted.some(a => a.length > 0);
     if (!hasAns) return false;
-    return !accepted.some(a => a && user === a);
+    // bỏ trống hoặc sai → cần ôn
+    return !(user && accepted.some(a => a && user === a));
   }
 
   exams.forEach(examNum => {
@@ -2130,7 +2129,7 @@ function buildWrongItems(examNumFilter, sectionFilter, groupFilter) {
 
           // Chỉ load nhóm nếu có ít nhất 1 câu đã làm SAI
           const hasWrong = allQsInGroup.some(q =>
-            isAnsweredWrong(part, q, sec.id, part.id, answers)
+            needsReview(part, q, sec.id, part.id, answers)
           );
           if (!hasWrong) return;
 

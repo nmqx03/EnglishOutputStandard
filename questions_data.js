@@ -14047,7 +14047,7 @@ const QUESTIONS = {
             "questions": [
               {
                 "num": 21,
-                "stem": "Rob Stene went to a restaurant for his birthday.",
+                "stem": "Rob Stone went to a restaurant for his birthday.",
                 "opts": [
                   "Right",
                   "Wrong",
