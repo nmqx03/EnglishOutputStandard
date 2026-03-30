@@ -1391,3 +1391,52 @@ body {
   border: 1px solid rgba(220,38,38,.15);
   padding: 1px 7px; border-radius: 100px;
 }
+
+/* ══════════════════════════════════════════════════════════
+   WRONG REVIEW — per-exam submit button & chip states
+══════════════════════════════════════════════════════════ */
+
+.wr-exam-block { margin-bottom: 4px; }
+
+.wr-exam-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .15s ease;
+  box-shadow: 0 3px 12px rgba(220,38,38,.28);
+}
+.wr-exam-submit-btn:hover {
+  opacity: .9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(220,38,38,.35);
+}
+.wr-exam-submit-btn:active { transform: scale(.98); }
+
+/* Chip — all correct state */
+.wr-chip--ok {
+  border-color: rgba(22,163,74,.3);
+  background: rgba(22,163,74,.05);
+}
+.wr-chip--ok:hover {
+  border-color: rgba(22,163,74,.5);
+  box-shadow: 0 4px 12px rgba(22,163,74,.12);
+}
+.wr-chip-ok {
+  background: rgba(22,163,74,.12);
+  border: 1px solid rgba(22,163,74,.28);
+  color: #15803d;
+  font-size: 12px; font-weight: 800;
+  padding: 1px 8px; border-radius: 100px;
+}

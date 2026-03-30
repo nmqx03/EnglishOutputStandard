@@ -1361,12 +1361,9 @@ const QUESTIONS = {
                 "label": "Time",
                 "prefix": "",
                 "suffix": "p.m.",
-                "ans": "3 pm",
+                "ans": "3",
                 "alts": [
-                  "3 p.m",
-                  "3pm",
-                  "3 o'clock",
-                  "three o'clock"
+                  "three"
                 ]
               },
               {
@@ -1569,7 +1566,7 @@ const QUESTIONS = {
                   "her passport",
                   "her driving licence"
                 ],
-                "ans": "B"
+                "ans": "A"
               },
               {
                 "num": 15,

@@ -1849,6 +1849,7 @@ function saveWR() {
     localStorage.setItem(WR_LS_KEY, JSON.stringify({
       answers: WR.answers,
       submitted: WR.submitted,
+      examSubmitted: WR.examSubmitted || {},
       filter: WR.filter,
       source: WR.source,
     }));
@@ -1994,6 +1995,52 @@ function updateWrongBannerSub() {
   if (sub) sub.textContent = 'Luyện lại những câu sai';
 }
 
+// Check result of a specific group after submission
+// Returns 'ok' if submitted and all questions correct, 'fail' if submitted with errors, null if not submitted
+function getWrGroupResult(examNum, section, group) {
+  const saved = loadSaved(examNum);
+  if (!saved || !saved.submitted) return null;
+  // Check if this exam was submitted in WR session
+  const wrSaved = loadWR();
+  if (!wrSaved || !wrSaved.examSubmitted || !wrSaved.examSubmitted[examNum]) return null;
+  const wrAnswers = wrSaved.answers || {};
+  const data = QUESTIONS[examNum];
+  if (!data) return null;
+  const isNgheSec_ = (id) => { const s=(id||'').toLowerCase(); return s.includes('ls')||s.includes('listen')||s.includes('nghe'); };
+  let allOk = true;
+  data.sections.forEach(sec => {
+    const isNghe = isNgheSec_(sec.id);
+    if (section === 'doc'  && isNghe)  return;
+    if (section === 'nghe' && !isNghe) return;
+    (sec.parts || []).forEach(part => {
+      if (part.type === 'writing') return;
+      if (part.type === 'matching') {
+        const correctMap = part.answers || {};
+        (part.questions || []).forEach(item => {
+          if (item.num < group.from || item.num > group.to) return;
+          const ans = String(correctMap[item.num] || '').trim();
+          if (!ans) return;
+          const k = wrKey(examNum, sec.id, part.id, item.num);
+          const user = (wrAnswers[k] || '').trim();
+          if (user !== ans) allOk = false;
+        });
+      } else {
+        (part.questions || []).forEach(q => {
+          if (q.num < group.from || q.num > group.to) return;
+          const k = wrKey(examNum, sec.id, part.id, q.num);
+          const user = (wrAnswers[k] || '').toLowerCase().trim();
+          const accepted = Array.isArray(q.ans) ? q.ans.map(a=>a.toLowerCase().trim()) : [(q.ans||'').toLowerCase().trim()];
+          if (q.alts) [].concat(q.alts).forEach(a=>accepted.push(a.toLowerCase().trim()));
+          const hasAns = accepted.some(a=>a.length>0);
+          if (!hasAns) return;
+          if (!(user && accepted.some(a=>a&&user===a))) allOk = false;
+        });
+      }
+    });
+  });
+  return allOk ? 'ok' : 'fail';
+}
+
 function renderWrongSelector() {
   const content = $('wrong-selector-content');
   content.innerHTML = '';
@@ -2056,7 +2103,7 @@ function renderWrongSelector() {
     const examWrong = byExam[examNum].reduce((a, r) => a + r.wrongCount, 0);
     examHdr.innerHTML = `
       <span class="wr-exam-hdr-num">Đề ${examNum}</span>
-      <span class="wr-exam-hdr-count">❌ ${examWrong} câu sai</span>
+      <span class="wr-exam-hdr-count">❌ ${examWrong} câu cần ôn</span>
     `;
     content.appendChild(examHdr);
 
@@ -2065,11 +2112,15 @@ function renderWrongSelector() {
     byExam[examNum].forEach(row => {
       const { section, group, wrongCount } = row;
       const secIcon = section === 'nghe' ? '🎧' : '📖';
-      const chip = CE('button', { className: 'wr-chip' });
+      // Check if this group was submitted and all correct
+      const groupResult = getWrGroupResult(examNum, section, group);
+      const chip = CE('button', { className: 'wr-chip' + (groupResult === 'ok' ? ' wr-chip--ok' : '') });
       chip.innerHTML = `
         <span class="wr-chip-sec">${secIcon}</span>
         <span class="wr-chip-range">${group.label}</span>
-        <span class="wr-chip-count">❌${wrongCount}</span>
+        ${groupResult === 'ok'
+          ? '<span class="wr-chip-count wr-chip-ok">✓</span>'
+          : `<span class="wr-chip-count">❌${wrongCount}</span>`}
       `;
       chip.addEventListener('click', () => startWrongExam(examNum, section, group));
       chipWrap.appendChild(chip);
@@ -2200,12 +2251,15 @@ function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
 
   // Restore saved session if exists
   const savedWR = loadWR();
-  if (savedWR && !savedWR.submitted) {
+  if (savedWR) {
     WR.answers = savedWR.answers || {};
+    WR.examSubmitted = savedWR.examSubmitted || {};
+    WR.submitted = savedWR.submitted || false;
   } else {
     WR.answers = {};
+    WR.examSubmitted = {};
+    WR.submitted = false;
   }
-  WR.submitted = (savedWR && savedWR.submitted) || false;
 
   // Build nav title
   const parts = [];
@@ -2221,7 +2275,7 @@ function startWrongExam(examNumFilter, sectionFilter, groupFilter) {
   $('wrong-screen').classList.add('hidden');
   $('wrong-exam-screen').classList.remove('hidden');
   $('wrong-result-panel').classList.add('hidden');
-  $('wrong-btn-submit').style.display = WR.submitted ? 'none' : '';
+  $('wrong-btn-submit').style.display = 'none'; // per-exam submit buttons used instead
 
   renderWrongAnswerSheet();
   if (WR.submitted) { markWrAnswers(); showWrResults(); }
@@ -2234,12 +2288,15 @@ function wrKey(examNum, secId, partId, num) {
   return `wr_e${examNum}_${secId}_${partId}_${num}`;
 }
 
+// WR per-exam submitted state: { [examNum]: true/false }
+// Stored inside WR.examSubmitted
 function renderWrongAnswerSheet() {
+  if (!WR.examSubmitted) WR.examSubmitted = {};
   const content = $('wrong-answer-content');
   content.innerHTML = '';
   $('wrong-result-panel').classList.add('hidden');
 
-  // Group items by examNum for cleaner display
+  // Group items by examNum
   const byExam = {};
   WR.items.forEach(item => {
     if (!byExam[item.examNum]) byExam[item.examNum] = [];
@@ -2249,26 +2306,29 @@ function renderWrongAnswerSheet() {
   const examNums = Object.keys(byExam).map(Number).sort((a,b)=>a-b);
 
   examNums.forEach((examNum, eIdx) => {
-    // Exam separator badge
-    const examBadge = CE('div', { className: 'prac-exam-source prac-exam-source--wrong' });
-    examBadge.innerHTML = `❌ Đề ${examNum} — câu sai`;
-    content.appendChild(examBadge);
+    const isSubmitted = !!WR.examSubmitted[examNum];
 
-    byExam[examNum].forEach((item, pIdx) => {
+    // ── Exam block wrapper ──
+    const examBlock = CE('div', { className: 'wr-exam-block', id: `wr-exam-block-${examNum}` });
+
+    // Badge
+    const examBadge = CE('div', { className: 'prac-exam-source prac-exam-source--wrong', id: `wr-badge-${examNum}` });
+    examBadge.innerHTML = isSubmitted
+      ? `✅ Đề ${examNum} — đã nộp`
+      : `❌ Đề ${examNum} — câu sai`;
+    examBlock.appendChild(examBadge);
+
+    byExam[examNum].forEach((item) => {
       const { secId, part } = item;
-      const isNghe = isNgheSec(secId);
-      const isLs1  = (part.id === 'ls1');
+      const isLs1 = (part.id === 'ls1');
       const selfRendersImg = (part.type === 'form_fill' || part.type === 'word_fill' || part.type === 'text_fill');
-
-      if (part.instruction) content.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
-
+      if (part.instruction) examBlock.appendChild(CE('div', { className: 'part-inst', textContent: part.instruction }));
       if (isLs1) {
-        if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
+        if (part.audioSrc) examBlock.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
       } else {
-        if (!selfRendersImg && part.imgSrc) content.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
-        if (part.audioSrc) content.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
+        if (!selfRendersImg && part.imgSrc) examBlock.appendChild(makePartImgEl(part.imgSrc, `Đề ${examNum}`));
+        if (part.audioSrc) examBlock.appendChild(renderAudioPlayer(part.audioSrc, `wr_e${examNum}_${part.id}`));
       }
-
       let qBlock;
       switch (part.type) {
         case 'matching':  qBlock = renderWrMatching(examNum, secId, part); break;
@@ -2278,13 +2338,120 @@ function renderWrongAnswerSheet() {
         case 'form_fill': qBlock = renderWrFormFill(examNum, secId, part); break;
         default:          qBlock = renderWrMCQ(examNum, secId, part); break;
       }
-      content.appendChild(qBlock);
+      examBlock.appendChild(qBlock);
     });
 
+    // ── Per-exam submit button ──
+    if (!isSubmitted) {
+      const submitBtn = CE('button', { className: 'wr-exam-submit-btn', id: `wr-submit-${examNum}` });
+      submitBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Nộp Đề ${examNum}`;
+      submitBtn.addEventListener('click', () => submitWrExam(examNum));
+      examBlock.appendChild(submitBtn);
+    } else {
+      // Already submitted — lock inputs and show answers
+      lockWrExamBlock(examNum, byExam[examNum]);
+    }
+
+    content.appendChild(examBlock);
     if (eIdx < examNums.length - 1) content.appendChild(CE('hr', { className: 'prac-exam-divider' }));
   });
 
   if (Object.keys(WR.answers).length) restoreWrAnswers();
+  // Re-lock already-submitted exams after restore
+  examNums.forEach(examNum => {
+    if (WR.examSubmitted[examNum]) lockWrExamBlock(examNum, byExam[examNum]);
+  });
+}
+
+// Lock all inputs in an exam block and show per-question feedback
+function lockWrExamBlock(examNum, items) {
+  const block = $(`wr-exam-block-${examNum}`);
+  if (!block) return;
+  block.querySelectorAll('.cbtn, .match-lbtn, .match-sel, input').forEach(el => { el.disabled = true; });
+  items.forEach(({ secId, part }) => markWrPartAnswers(examNum, secId, part));
+  // Remove submit button if present
+  const btn = $(`wr-submit-${examNum}`);
+  if (btn) btn.remove();
+}
+
+// Submit a single exam block
+function submitWrExam(examNum) {
+  if (!WR.examSubmitted) WR.examSubmitted = {};
+  WR.examSubmitted[examNum] = true;
+
+  // Update badge
+  const badge = $(`wr-badge-${examNum}`);
+  if (badge) badge.innerHTML = `✅ Đề ${examNum} — đã nộp`;
+
+  // Find items for this exam
+  const items = WR.items.filter(i => i.examNum === examNum);
+  lockWrExamBlock(examNum, items);
+
+  saveWR();
+  updateWrongUI();
+  checkAllWrSubmitted();
+}
+
+// Check if all exams are submitted → update chips in selector
+function checkAllWrSubmitted() {
+  if (!WR.examSubmitted) return;
+  const examNums = [...new Set(WR.items.map(i => i.examNum))];
+  const allDone = examNums.every(n => WR.examSubmitted[n]);
+  if (allDone) {
+    // Show overall results panel
+    showWrResults();
+  }
+  // Always refresh selector chips (to update ✓/❌ status)
+}
+
+// Mark answers for one part
+function markWrPartAnswers(examNum, secId, part) {
+  const content = $('wrong-answer-content');
+  if (part.type === 'matching') {
+    const correctMap = part.answers || {};
+    const isBtn = (part.id === 'p1' || part.id === 'ls2');
+    (part.questions||[]).forEach(item => {
+      const k = wrKey(examNum, secId, part.id, item.num);
+      const correct = String(correctMap[item.num]||'');
+      const user = WR.answers[k]||'';
+      const fb = $(`wrfb_${k}`);
+      if (!correct) return;
+      if (isBtn) {
+        content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${item.num}"]`).forEach(b => {
+          if (b.dataset.val===correct) b.classList.add('lbtn-correct');
+          else if (b.dataset.val===user && user!==correct) b.classList.add('lbtn-wrong');
+        });
+      } else {
+        const sel = $(`wrsel_${k}`);
+        if (sel) sel.classList.add(user===correct?'correct-fill':'wrong-fill');
+      }
+      if (fb) { fb.className='q-fb '+(user===correct?'ok':'bad'); fb.textContent=user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
+    });
+    return;
+  }
+  (part.questions||[]).forEach(q => {
+    const k = wrKey(examNum, secId, part.id, q.num);
+    const fb = $(`wrfb_${k}`);
+    if (part.type === 'mcq') {
+      const correct = (q.ans||'').toUpperCase().trim();
+      const user = (WR.answers[k]||'').toUpperCase().trim();
+      content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${q.num}"]`).forEach(btn => {
+        if (btn.dataset.val===correct && correct) btn.classList.add('correct');
+        if (btn.dataset.val===user && user!==correct) btn.classList.add('wrong-sel');
+      });
+      if (fb && correct) { fb.className='q-fb '+(user===correct?'ok':'bad'); fb.textContent=user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
+    } else {
+      const inp = $(`wrinp_${k}`);
+      const userLow = (WR.answers[k]||'').toLowerCase().trim();
+      const accepted = Array.isArray(q.ans)?q.ans.map(a=>a.toLowerCase().trim()):[(q.ans||'').toLowerCase().trim()];
+      if (q.alts) [].concat(q.alts).forEach(a=>accepted.push(a.toLowerCase().trim()));
+      const isOk = userLow!==''&&accepted.some(a=>a&&userLow===a);
+      const displayAns = Array.isArray(q.ans)?q.ans.join(' / '):q.ans;
+      const hasAns = Array.isArray(q.ans)?q.ans.length>0:!!q.ans;
+      if (inp && hasAns) inp.classList.add(isOk?'correct-fill':'wrong-fill');
+      if (fb && hasAns) { fb.className='q-fb '+(isOk?'ok':'bad'); fb.textContent=isOk?'✓ Đúng':`✗ Đáp án: ${displayAns}`; }
+    }
+  });
 }
 
 // ── WR MCQ ───────────────────────────────────────────────────
@@ -2551,58 +2718,9 @@ function updateWrongUI() {
   $('wrong-unanswered-count').textContent = total - done;
 }
 
-// ── WR MARK ──────────────────────────────────────────────────
+// ── WR MARK ── delegates to markWrPartAnswers (called per-exam on submit)
 function markWrAnswers() {
-  const content = $('wrong-answer-content');
-  content.querySelectorAll('.cbtn, .match-lbtn, .match-sel, input').forEach(el => { el.disabled = true; });
-
-  WR.items.forEach(({ examNum, secId, part }) => {
-    if (part.type === 'matching') {
-      const correctMap = part.answers || {};
-      const isBtn = (part.id === 'p1' || part.id === 'ls2');
-      (part.questions||[]).forEach(item => {
-        const k = wrKey(examNum, secId, part.id, item.num);
-        const correct = String(correctMap[item.num]||'');
-        const user = WR.answers[k]||'';
-        const fb = $(`wrfb_${k}`);
-        if (!correct) return;
-        if (isBtn) {
-          content.querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${item.num}"]`).forEach(b => {
-            if (b.dataset.val === correct) b.classList.add('lbtn-correct');
-            else if (b.dataset.val === user && user !== correct) b.classList.add('lbtn-wrong');
-          });
-        } else {
-          const sel = $(`wrsel_${k}`);
-          if (sel) sel.classList.add(user === correct ? 'correct-fill' : 'wrong-fill');
-        }
-        if (fb) { fb.className = 'q-fb '+(user===correct?'ok':'bad'); fb.textContent = user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
-      });
-      return;
-    }
-    (part.questions||[]).forEach(q => {
-      const k = wrKey(examNum, secId, part.id, q.num);
-      const fb = $(`wrfb_${k}`);
-      if (part.type === 'mcq') {
-        const correct = (q.ans||'').toUpperCase().trim();
-        const user = (WR.answers[k]||'').toUpperCase().trim();
-        content.querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${secId}"][data-part="${part.id}"][data-num="${q.num}"]`).forEach(btn => {
-          if (btn.dataset.val===correct && correct) btn.classList.add('correct');
-          if (btn.dataset.val===user && user!==correct) btn.classList.add('wrong-sel');
-        });
-        if (fb && correct) { fb.className='q-fb '+(user===correct?'ok':'bad'); fb.textContent=user===correct?'✓ Đúng':`✗ Đáp án: ${correct}`; }
-      } else {
-        const inp = $(`wrinp_${k}`);
-        const userLow = (WR.answers[k]||'').toLowerCase().trim();
-        const accepted = Array.isArray(q.ans)?q.ans.map(a=>a.toLowerCase().trim()):[(q.ans||'').toLowerCase().trim()];
-        if (q.alts) [].concat(q.alts).forEach(a=>accepted.push(a.toLowerCase().trim()));
-        const isOk = userLow!==''&&accepted.some(a=>a&&userLow===a);
-        const displayAns = Array.isArray(q.ans)?q.ans.join(' / '):q.ans;
-        const hasAns = Array.isArray(q.ans)?q.ans.length>0:!!q.ans;
-        if (inp && hasAns) inp.classList.add(isOk?'correct-fill':'wrong-fill');
-        if (fb && hasAns) { fb.className='q-fb '+(isOk?'ok':'bad'); fb.textContent=isOk?'✓ Đúng':`✗ Đáp án: ${displayAns}`; }
-      }
-    });
-  });
+  WR.items.forEach(({ examNum, secId, part }) => markWrPartAnswers(examNum, secId, part));
 }
 
 // ── WR RESULTS ───────────────────────────────────────────────
@@ -2641,8 +2759,8 @@ function showWrResults() {
 }
 
 function resetWrExam() {
-  WR.answers={}; WR.submitted=false;
-  $('wrong-btn-submit').style.display='';
+  WR.answers = {}; WR.submitted = false; WR.examSubmitted = {};
+  $('wrong-btn-submit').style.display = '';
   $('wrong-result-panel').classList.add('hidden');
   renderWrongAnswerSheet();
   updateWrongUI();
