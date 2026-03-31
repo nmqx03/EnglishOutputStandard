@@ -1169,6 +1169,27 @@ const PRAC = {
   questions: [],        // flat list of { examNum, secId, part, q }
 };
 
+const PRAC_LS_KEY = 'humg_prac_session';
+
+function savePrac() {
+  try {
+    localStorage.setItem(PRAC_LS_KEY, JSON.stringify({
+      section: PRAC.section,
+      group: PRAC.group,
+      answers: PRAC.answers,
+      submitted: PRAC.submitted,
+    }));
+  } catch(e) {}
+}
+
+function loadPrac() {
+  try { return JSON.parse(localStorage.getItem(PRAC_LS_KEY)); } catch(e) { return null; }
+}
+
+function clearPracSession() {
+  try { localStorage.removeItem(PRAC_LS_KEY); } catch(e) {}
+}
+
 // ── FIXED question groups per section ──────────────────────────
 // Reading:  1-5 | 6-10 | 11-15 | 21-27 | 28-35 | 36-40 | 41-50 | 51-55
 // Listening: 1-5 | 6-10 | 11-15 | 16-20 | 21-25
@@ -1295,13 +1316,23 @@ function pracKey(examNum, secId, partId, num) {
 }
 
 function startPractice() {
-  PRAC.answers = {};
-  PRAC.submitted = false;
   PRAC.questions = collectPracQuestions();
 
   if (!PRAC.questions.length) {
     showToast('⚠️ Không tìm thấy câu hỏi cho dạng này.');
     return;
+  }
+
+  // Restore saved session nếu cùng section + group
+  const saved = loadPrac();
+  if (saved && saved.section === PRAC.section &&
+      saved.group && saved.group.from === PRAC.group.from &&
+      saved.group.to === PRAC.group.to) {
+    PRAC.answers   = saved.answers   || {};
+    PRAC.submitted = saved.submitted || false;
+  } else {
+    PRAC.answers   = {};
+    PRAC.submitted = false;
   }
 
   const secLabel = PRAC.section === 'nghe' ? 'Phần Nghe' : 'Phần Đọc';
@@ -1310,9 +1341,10 @@ function startPractice() {
   $('practice-screen').classList.add('hidden');
   $('prac-exam-screen').classList.remove('hidden');
   $('prac-result-panel').classList.add('hidden');
-  $('prac-btn-submit').style.display = '';
+  $('prac-btn-submit').style.display = PRAC.submitted ? 'none' : '';
 
   renderPracAnswerSheet();
+  if (PRAC.submitted) { markPracAnswers(); showPracResults(); }
   updatePracUI();
 }
 
@@ -1420,6 +1452,7 @@ function onPracMCQClick(e) {
     $('prac-answer-content').querySelectorAll(`.cbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
       .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
   }
+  savePrac();
   updatePracUI();
 }
 
@@ -1535,6 +1568,7 @@ function onPracMatchBtnClick(e) {
     $('prac-answer-content').querySelectorAll(`.match-lbtn[data-exam-num="${examNum}"][data-sec="${sec}"][data-part="${part}"][data-num="${num}"]`)
       .forEach(b => b.classList.toggle('selected', b.dataset.val === val));
   }
+  savePrac();
   updatePracUI();
 }
 
@@ -1542,6 +1576,7 @@ function onPracMatchChange(e) {
   if (PRAC.submitted) return;
   const { examNum, sec, part, num } = e.target.dataset;
   PRAC.answers[pracKey(examNum, sec, part, num)] = e.target.value;
+  savePrac();
   updatePracUI();
 }
 
@@ -1596,7 +1631,7 @@ function renderPracFormFill(examNum, secId, part) {
 function buildPracFillRow(examNum, secId, part, q) {
   const k = pracKey(examNum, secId, part.id, q.num);
   const row = CE('div', { className: 'fill-row', id: `pqrow_${k}` });
-  const hasStem = q.stem && !q.stem.match(/^\(Xem/);
+  const hasStem = q.stem && !q.stem.match(/^\(Xem/) && !(q.num >= 41 && q.num <= 50);
   if (hasStem) {
     const stem = CE('div', { className: 'q-stem' });
     stem.innerHTML = `<span class="q-num">${q.num}.</span> ${esc(q.stem)}${q.hint ? `<span class="fill-hint"> (${esc(q.hint)})</span>` : ''}`;
@@ -1608,6 +1643,20 @@ function buildPracFillRow(examNum, secId, part, q) {
   inp.dataset.examNum = examNum; inp.dataset.sec = secId; inp.dataset.part = part.id; inp.dataset.num = q.num;
   inp.addEventListener('input', onPracFillInput);
   inpRow.appendChild(inp);
+  // Q36-40: hiển thị chữ cái đầu + dấu gạch
+  if (q.num >= 36 && q.num <= 40) {
+    const primary = getPrimaryAns(q.ans);
+    if (primary.length > 0) {
+      const first = primary[0].toUpperCase();
+      const rest  = primary.length - 1;
+      const hint  = CE('span', { className: 'fill-letter-hint' });
+      hint.innerHTML =
+        `<span class="fill-first">${first}</span>` +
+        (rest > 0 ? `<span class="fill-blanks">${'_ '.repeat(rest).trim()}</span>` : '') +
+        `<span class="fill-count">(${primary.length} chữ cái)</span>`;
+      inpRow.appendChild(hint);
+    }
+  }
   row.appendChild(inpRow);
   row.appendChild(CE('div', { className: 'q-fb', id: `pfb_${k}` }));
   return row;
@@ -1616,6 +1665,7 @@ function buildPracFillRow(examNum, secId, part, q) {
 function onPracFillInput(e) {
   const { examNum, sec, part, num } = e.target.dataset;
   PRAC.answers[pracKey(examNum, sec, part, num)] = e.target.value.trim();
+  savePrac();
   updatePracUI();
 }
 
@@ -1767,6 +1817,7 @@ function showPracResults() {
 function resetPracExam() {
   PRAC.answers = {};
   PRAC.submitted = false;
+  clearPracSession();
   $('prac-btn-submit').style.display = '';
   $('prac-result-panel').classList.add('hidden');
   renderPracAnswerSheet();
@@ -1814,6 +1865,7 @@ $('prac-modal-confirm').addEventListener('click', () => {
   $('prac-modal-submit').classList.add('hidden');
   PRAC.submitted = true;
   $('prac-btn-submit').style.display = 'none';
+  savePrac();
   markPracAnswers();
   showPracResults();
 });

@@ -2401,7 +2401,7 @@ const QUESTIONS = {
                 "ans": "B",
                 "stem": "Jim and Sue are going to go the sports centre next",
                 "opts": [
-                  "Wednesdat",
+                  "Wednesday",
                   "Thursday",
                   "Saturday"
                 ]
@@ -5885,7 +5885,7 @@ const QUESTIONS = {
                 "suffix": "",
                 "ans": "11am",
                 "alts": [
-                  "11 am",
+                  "11 a.m",
                   "11 in the morning",
                   "eleven o'clock",
                   "eleven am",
